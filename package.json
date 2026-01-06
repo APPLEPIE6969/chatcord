@@ -1,13 +1,14 @@
 {
   "name": "chatcord",
-  "version": "1.0.0",
-  "description": "Real-time chat app",
+  "version": "2.0.0",
+  "description": "Real-time chat with history and uploads",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "latest",
-    "socket.io": "latest"
+    "socket.io": "latest",
+    "multer": "latest"
   }
 }
