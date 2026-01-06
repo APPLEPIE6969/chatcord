@@ -3,154 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatcord</title>
+    <title>Chatcord 2.0</title>
     <style>
         :root {
             --bg-dark: #202225;
             --bg-sidebar: #2f3136;
             --bg-chat: #36393f;
-            --bg-header: #36393f;
             --text-main: #dcddde;
             --text-muted: #72767d;
             --accent: #5865F2;
             --input-bg: #40444b;
         }
 
-        body { margin: 0; font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
-        
+        body { margin: 0; font-family: 'Whitney', Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
         #app { display: flex; height: 100vh; width: 100vw; }
 
         /* SIDEBAR */
-        #sidebar {
-            width: 240px;
-            background-color: var(--bg-sidebar);
-            display: flex;
-            flex-direction: column;
-        }
-        .server-header {
-            height: 50px;
-            padding: 0 16px;
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            font-size: 16px;
-            border-bottom: 1px solid #202225;
-            box-shadow: 0 1px 0 rgba(4,4,5,0.2),0 1.5px 0 rgba(6,6,7,0.05),0 2px 0 rgba(4,4,5,0.05);
-        }
+        #sidebar { width: 240px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; }
+        .server-header { height: 50px; padding: 0 16px; display: flex; align-items: center; font-weight: bold; border-bottom: 1px solid #202225; box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
         .channel-list { padding: 10px 8px; flex-grow: 1; }
         .category { font-size: 12px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin: 10px 0 5px 8px; }
-        
-        .channel {
-            padding: 6px 8px;
-            margin: 1px 0;
-            border-radius: 4px;
-            cursor: pointer;
-            color: #8e9297;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-        }
+        .channel { padding: 6px 8px; margin: 1px 0; border-radius: 4px; cursor: pointer; color: #8e9297; display: flex; align-items: center; }
         .channel:hover { background-color: #34373c; color: var(--text-main); }
         .channel.active { background-color: #393c43; color: white; }
         .channel::before { content: '#'; margin-right: 6px; font-size: 20px; color: var(--text-muted); }
 
         /* CHAT AREA */
-        #chat-area {
-            flex-grow: 1;
-            background-color: var(--bg-chat);
-            display: flex;
-            flex-direction: column;
-        }
-        #chat-header {
-            height: 50px;
-            border-bottom: 1px solid #26272d;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            font-weight: bold;
-            box-shadow: 0 1px 0 rgba(4,4,5,0.2),0 1.5px 0 rgba(6,6,7,0.05),0 2px 0 rgba(4,4,5,0.05);
-        }
+        #chat-area { flex-grow: 1; background-color: var(--bg-chat); display: flex; flex-direction: column; }
+        #chat-header { height: 50px; border-bottom: 1px solid #26272d; display: flex; align-items: center; padding: 0 16px; font-weight: bold; box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
         #header-hash { color: var(--text-muted); margin-right: 8px; font-size: 24px; }
 
-        #messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        #messages { flex-grow: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 15px; }
         #messages::-webkit-scrollbar { width: 8px; background: #2e3338; }
         #messages::-webkit-scrollbar-thumb { background: #202225; border-radius: 4px; }
 
-        .message { display: flex; margin-top: 10px; }
-        .avatar {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            margin-right: 16px;
-            background-color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 18px;
-            flex-shrink: 0;
-        }
+        .message { display: flex; margin-top: 5px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 16px; background-color: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; flex-shrink: 0; }
         .msg-content { display: flex; flex-direction: column; }
         .msg-header { display: flex; align-items: baseline; gap: 8px; }
         .username { font-weight: 500; color: white; cursor: pointer; }
-        .username:hover { text-decoration: underline; }
         .timestamp { font-size: 12px; color: var(--text-muted); }
-        .text { margin-top: 4px; color: #dcddde; font-size: 16px; line-height: 1.375rem; white-space: pre-wrap; word-wrap: break-word; }
+        .text { margin-top: 4px; color: #dcddde; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
+        
+        /* FILE ATTACHMENTS */
+        .attachment-img { max-width: 300px; max-height: 300px; border-radius: 8px; margin-top: 5px; cursor: pointer; }
+        .attachment-file { background: #2f3136; padding: 10px; border-radius: 5px; margin-top: 5px; display: flex; align-items: center; color: var(--accent); text-decoration: none; width: fit-content; border: 1px solid #202225; }
+        .attachment-file:hover { background: #34373c; }
 
         .system-msg { color: var(--text-muted); font-size: 14px; margin-left: 10px; display: flex; align-items: center; gap: 10px; }
         .system-msg::before { content: '➜'; color: var(--accent); }
 
         /* INPUT AREA */
-        #input-area { padding: 0 16px 24px; }
-        #input-wrapper {
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            padding: 11px 16px;
-        }
-        #input-box {
-            background: transparent;
-            border: none;
-            width: 100%;
-            color: var(--text-main);
-            font-size: 16px;
-            outline: none;
-        }
+        #input-area { padding: 0 16px 24px; display: flex; gap: 10px; align-items: flex-start; }
+        #input-wrapper { background-color: var(--input-bg); border-radius: 8px; padding: 0 16px; flex-grow: 1; display: flex; align-items: center; }
+        #input-box { background: transparent; border: none; width: 100%; color: var(--text-main); font-size: 16px; outline: none; padding: 11px 0; }
+        
+        /* UPLOAD BUTTON */
+        #upload-btn { background: none; border: none; color: #b9bbbe; font-size: 24px; cursor: pointer; padding: 0 10px 0 0; display: flex; align-items: center; height: 44px; }
+        #upload-btn:hover { color: var(--text-main); }
 
         /* LOGIN SCREEN */
-        #login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #36393f;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 999;
-            background-image: url('https://discord.com/assets/f9e7949363073733.svg'); /* Fake background */
-            background-size: cover;
-        }
-        .login-box {
-            background: #2f3136;
-            padding: 32px;
-            border-radius: 5px;
-            width: 480px;
-            box-shadow: 0 2px 10px 0 rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        .login-box h2 { color: white; margin-bottom: 8px; font-size: 24px; }
-        .login-box h4 { color: #b9bbbe; font-weight: normal; margin-bottom: 20px; font-size: 16px; }
-        .login-box input {
-            width: 90%; padding: 10px; margin-bottom: 20px;
-            background: #202225; border: 1px solid #202225;
-            color: white; border-radius: 3px; height: 20px;
-        }
-        .login-box button {
-            width: 95%; padding: 12px;
-            background: var(--accent); color: white; border: none;
-            border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 16px;
-            transition: background-color .17s ease;
-        }
-        .login-box button:hover { background-color: #4752c4; }
-
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #36393f; display: flex; align-items: center; justify-content: center; z-index: 999; }
+        .login-box { background: #2f3136; padding: 32px; border-radius: 5px; width: 480px; text-align: center; box-shadow: 0 2px 10px 0 rgba(0,0,0,0.2); }
+        .login-box h2 { color: white; margin-bottom: 8px; }
+        .login-box input { width: 90%; padding: 10px; margin-bottom: 20px; background: #202225; border: 1px solid #202225; color: white; border-radius: 3px; }
+        .login-box button { width: 95%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -159,16 +76,14 @@
     <div id="login-overlay">
         <div class="login-box">
             <h2>Welcome to Chatcord</h2>
-            <h4>Please login to continue</h4>
-            <div style="text-align: left; width: 90%; margin: 0 auto; color: #b9bbbe; font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">Username</div>
+            <div style="text-align: left; width: 90%; margin: 0 auto; color: #b9bbbe; font-size: 12px; font-weight: bold; margin-bottom: 8px;">USERNAME</div>
             <input type="text" id="username-input" maxlength="15">
-            <button onclick="login()">Log In</button>
+            <button onclick="manualLogin()">Log In</button>
         </div>
     </div>
 
     <!-- MAIN APP -->
     <div id="app">
-        <!-- SIDEBAR -->
         <div id="sidebar">
             <div class="server-header">Chatcord Community</div>
             <div class="channel-list">
@@ -177,62 +92,60 @@
                 <div class="channel" onclick="switchChannel('clips', this)">clips</div>
                 <div class="channel" onclick="switchChannel('music', this)">music</div>
                 <div class="channel" onclick="switchChannel('memes', this)">memes</div>
-                <div class="category">Voice Channels</div>
-                <div class="channel" style="opacity:0.5; cursor:not-allowed;">🔊 Lounge (Locked)</div>
             </div>
         </div>
 
-        <!-- CHAT -->
         <div id="chat-area">
             <div id="chat-header"><span id="header-hash">#</span> <span id="header-name">general</span></div>
-            <div id="messages">
-                <!-- Chat goes here -->
-                <div style="margin-top: auto;"></div>
-            </div>
+            <div id="messages"></div>
             <div id="input-area">
                 <div id="input-wrapper">
+                    <button id="upload-btn" onclick="document.getElementById('file-input').click()">+</button>
                     <input type="text" id="msg-input" placeholder="Message #general" autocomplete="off">
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Hidden File Input -->
+    <input type="file" id="file-input" style="display: none;" onchange="uploadFile()">
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         let myUsername = "";
         
-        // --- LOGIN ---
-        function login() {
+        // --- 1. AUTO LOGIN LOGIC ---
+        window.onload = () => {
+            const savedUser = localStorage.getItem('chatcord_user');
+            if(savedUser) {
+                myUsername = savedUser;
+                document.getElementById('login-overlay').style.display = 'none';
+                socket.emit('join', myUsername);
+            }
+        };
+
+        function manualLogin() {
             const name = document.getElementById('username-input').value.trim();
             if(name) {
                 myUsername = name;
+                localStorage.setItem('chatcord_user', name); // SAVE TO BROWSER
                 document.getElementById('login-overlay').style.display = 'none';
                 socket.emit('join', myUsername);
             }
         }
-        document.getElementById('username-input').addEventListener("keypress", e => { if(e.key==="Enter") login(); });
+        document.getElementById('username-input').addEventListener("keypress", e => { if(e.key==="Enter") manualLogin(); });
 
-        // --- SENDING ---
+        // --- 2. MESSAGE HANDLING ---
         const input = document.getElementById('msg-input');
         input.addEventListener("keypress", e => {
             if (e.key === "Enter" && input.value.trim() !== "") {
-                socket.emit('chatMessage', input.value);
+                socket.emit('chatMessage', { text: input.value });
                 input.value = "";
             }
         });
 
-        // --- SWITCH CHANNELS ---
-        window.switchChannel = function(channelName, el) {
-            document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('header-name').innerText = channelName;
-            document.getElementById('msg-input').placeholder = `Message #${channelName}`;
-            socket.emit('switchChannel', channelName);
-        }
-
-        // --- RECEIVE MESSAGES ---
-        socket.on('message', (data) => {
+        function renderMessage(data) {
             const box = document.getElementById('messages');
             
             if(data.type === 'system') {
@@ -244,10 +157,20 @@
                 const div = document.createElement('div');
                 div.className = 'message';
                 
-                // Color for avatar based on name
                 let hash = 0;
                 for (let i = 0; i < data.user.length; i++) hash = data.user.charCodeAt(i) + ((hash << 5) - hash);
                 const color = `hsl(${hash % 360}, 70%, 50%)`;
+
+                let attachmentHtml = '';
+                if(data.file) {
+                    const ext = data.file.filename.split('.').pop().toLowerCase();
+                    const path = `/uploads/${data.file.filename}`;
+                    if(['jpg','jpeg','png','gif','webp'].includes(ext)) {
+                        attachmentHtml = `<a href="${path}" target="_blank"><img src="${path}" class="attachment-img"></a>`;
+                    } else {
+                        attachmentHtml = `<a href="${path}" target="_blank" class="attachment-file">📁 ${data.file.originalName}</a>`;
+                    }
+                }
 
                 div.innerHTML = `
                     <div class="avatar" style="background-color:${color}">${data.user[0].toUpperCase()}</div>
@@ -257,22 +180,68 @@
                             <span class="timestamp">${data.time}</span>
                         </div>
                         <div class="text">${data.text}</div>
+                        ${attachmentHtml}
                     </div>
                 `;
                 box.appendChild(div);
             }
             box.scrollTop = box.scrollHeight;
+        }
+
+        // --- 3. SOCKET EVENTS ---
+        socket.on('message', (data) => renderMessage(data));
+        
+        socket.on('loadHistory', (history) => {
+            document.getElementById('messages').innerHTML = ''; // Clear first
+            history.forEach(msg => renderMessage(msg));
         });
 
-        socket.on('channelSwitched', (channel) => {
+        window.switchChannel = function(channelName, el) {
+            document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('header-name').innerText = channelName;
+            document.getElementById('msg-input').placeholder = `Message #${channelName}`;
+            socket.emit('switchChannel', channelName);
+        }
+
+        socket.on('channelSwitched', (data) => {
             document.getElementById('messages').innerHTML = `
                 <div style="padding: 20px; margin-top: auto;">
                     <div style="background:#40444b; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px; color:white; margin-bottom:10px;">#</div>
-                    <h1 style="color:white; margin:0;">Welcome to #${channel}!</h1>
-                    <p style="color:#b9bbbe;">This is the start of the #${channel} channel.</p>
+                    <h1 style="color:white; margin:0;">Welcome to #${data.channel}!</h1>
+                    <p style="color:#b9bbbe;">This is the start of the #${data.channel} channel.</p>
                 </div>
             `;
+            // Load history for this channel
+            data.history.forEach(msg => renderMessage(msg));
         });
+
+        // --- 4. FILE UPLOAD LOGIC ---
+        function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            if(!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show uploading state?
+            input.placeholder = "Uploading...";
+
+            fetch('/upload', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                // Send file info to socket
+                socket.emit('chatMessage', { text: "", file: data });
+                input.placeholder = `Message #${document.getElementById('header-name').innerText}`;
+                fileInput.value = ''; // Reset
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Upload failed.");
+                input.placeholder = `Message #${document.getElementById('header-name').innerText}`;
+            });
+        }
     </script>
 </body>
 </html>
