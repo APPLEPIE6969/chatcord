@@ -9,10 +9,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// --- SETUP ---
+// --- 1. SETUP STORAGE ---
 const uploadDir = path.join(__dirname, 'public/uploads');
+const DATA_FILE = path.join(__dirname, 'chat_data.json');
+
+// Create uploads folder if missing
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
+// Configure File Uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
@@ -21,49 +25,83 @@ const upload = multer({ storage: storage });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- STORAGE ---
-let users = {}; // { socketId: { name, channel } }
-let voiceUsers = {}; // { socketId: roomId }
+// --- 2. PERSISTENT DATA MANAGEMENT ---
+let users = {}; 
+let voiceUsers = {}; 
 let messageHistory = { 'general': [], 'clips': [], 'music': [], 'memes': [] };
 
-// Cleanup Timer
+// LOAD DATA ON STARTUP
+if (fs.existsSync(DATA_FILE)) {
+    try {
+        const raw = fs.readFileSync(DATA_FILE);
+        messageHistory = JSON.parse(raw);
+        console.log("Creating/Loading chat history...");
+    } catch (e) {
+        console.log("Error loading history, starting fresh.");
+    }
+}
+
+// SAVE DATA FUNCTION
+function saveHistory() {
+    fs.writeFile(DATA_FILE, JSON.stringify(messageHistory, null, 2), (err) => {
+        if (err) console.error("Error saving chat:", err);
+    });
+}
+
+// CLEANUP (Keep only last 24h)
 setInterval(() => {
     const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+    let changed = false;
     Object.keys(messageHistory).forEach(channel => {
+        const initialLen = messageHistory[channel].length;
         messageHistory[channel] = messageHistory[channel].filter(msg => msg.timestamp > oneDayAgo);
+        if(messageHistory[channel].length !== initialLen) changed = true;
     });
-}, 1000 * 60 * 60);
+    if(changed) saveHistory();
+}, 1000 * 60 * 60); // Run every hour
 
-// --- ROUTES ---
+// --- 3. ROUTES ---
 app.post('/upload', upload.single('file'), (req, res) => {
     if(req.file) res.json({ filename: req.file.filename, originalName: req.file.originalname });
     else res.status(400).send('No file uploaded');
 });
 
-// --- SOCKET LOGIC ---
+// --- 4. SOCKET LOGIC ---
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
-    // 1. TEXT CHAT
+    // JOIN
     socket.on('join', (username) => {
+        // Default to general
         users[socket.id] = { name: username, channel: 'general' };
         socket.join('general');
-        socket.emit('loadHistory', messageHistory['general']);
         
-        const sysMsg = { user: 'System', text: `Welcome back, ${username}!`, type: 'system', timestamp: Date.now() };
-        socket.emit('message', sysMsg);
-        socket.to('general').emit('message', { user: 'System', text: `${username} hopped in.`, type: 'system', timestamp: Date.now() });
+        // SEND SAVED HISTORY
+        socket.emit('loadHistory', messageHistory['general'] || []);
+        
+        // Announce
+        const joinMsg = { user: 'System', text: `Welcome back, ${username}!`, type: 'system', timestamp: Date.now() };
+        socket.emit('message', joinMsg);
+        socket.to('general').emit('message', { user: 'System', text: `${username} joined.`, type: 'system', timestamp: Date.now() });
     });
 
+    // SWITCH CHANNEL
     socket.on('switchChannel', (newChannel) => {
         const user = users[socket.id];
         if (!user) return;
+        
         socket.leave(user.channel);
         socket.join(newChannel);
         user.channel = newChannel;
-        socket.emit('channelSwitched', { channel: newChannel, history: messageHistory[newChannel] || [] });
+        
+        // Send history for new channel
+        socket.emit('channelSwitched', { 
+            channel: newChannel, 
+            history: messageHistory[newChannel] || [] 
+        });
     });
 
+    // CHAT MESSAGE
     socket.on('chatMessage', (data) => {
         const user = users[socket.id];
         if (user) {
@@ -75,26 +113,24 @@ io.on('connection', (socket) => {
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 timestamp: Date.now()
             };
+
+            // Save to Memory & Disk
             if (!messageHistory[user.channel]) messageHistory[user.channel] = [];
             messageHistory[user.channel].push(msgData);
+            saveHistory(); // <--- SAVES TO FILE
+
             io.to(user.channel).emit('message', msgData);
         }
     });
 
-    // 2. VOICE CHAT SIGNALING
+    // VOICE SIGNALING (WebRTC)
     socket.on('joinVoice', (roomId) => {
-        if(voiceUsers[socket.id]) return; // Already in
         voiceUsers[socket.id] = roomId;
-        
-        // Get all other users in this voice room
         const others = Object.keys(voiceUsers).filter(id => voiceUsers[id] === roomId && id !== socket.id);
-        
-        // Tell current user who is already there
         socket.emit('voiceUsers', others);
     });
 
     socket.on('voiceSignal', (data) => {
-        // Relay signal (offer/answer/ice) to specific user
         io.to(data.to).emit('voiceSignal', { from: socket.id, signal: data.signal });
     });
 
@@ -102,21 +138,17 @@ io.on('connection', (socket) => {
         const room = voiceUsers[socket.id];
         if(room) {
             delete voiceUsers[socket.id];
-            // Tell others I left
             Object.keys(voiceUsers).forEach(id => {
-                if(voiceUsers[id] === room) {
-                    io.to(id).emit('userLeftVoice', socket.id);
-                }
+                if(voiceUsers[id] === room) io.to(id).emit('userLeftVoice', socket.id);
             });
         }
     });
 
-    // 3. DISCONNECT
+    // DISCONNECT
     socket.on('disconnect', () => {
         const user = users[socket.id];
         if (user) delete users[socket.id];
         
-        // Handle voice disconnect
         const room = voiceUsers[socket.id];
         if(room) {
             delete voiceUsers[socket.id];
