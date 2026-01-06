@@ -3,95 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatcord 2.0</title>
+    <title>Chatcord Ultimate</title>
     <style>
+        /* --- THEMES --- */
+        /* Normal (Default) */
         :root {
             --bg-dark: #202225;
             --bg-sidebar: #2f3136;
             --bg-chat: #36393f;
+            --bg-header: #36393f;
             --text-main: #dcddde;
             --text-muted: #72767d;
             --accent: #5865F2;
             --input-bg: #40444b;
+            --border: #202225;
+        }
+
+        /* Light Mode */
+        [data-theme="light"] {
+            --bg-dark: #e3e5e8;
+            --bg-sidebar: #f2f3f5;
+            --bg-chat: #ffffff;
+            --bg-header: #ffffff;
+            --text-main: #2e3338;
+            --text-muted: #747f8d;
+            --accent: #5865F2;
+            --input-bg: #ebedef;
+            --border: #e3e5e8;
+        }
+
+        /* Dark Mode (OLED) */
+        [data-theme="dark"] {
+            --bg-dark: #000000;
+            --bg-sidebar: #0a0a0a;
+            --bg-chat: #111111;
+            --bg-header: #111111;
+            --text-main: #eeeeee;
+            --text-muted: #888888;
+            --accent: #3ba55c; /* Green accent for dark */
+            --input-bg: #222222;
+            --border: #333333;
         }
 
         body { margin: 0; font-family: 'Whitney', Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
         #app { display: flex; height: 100vh; width: 100vw; }
 
         /* SIDEBAR */
-        #sidebar { width: 240px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; }
-        .server-header { height: 50px; padding: 0 16px; display: flex; align-items: center; font-weight: bold; border-bottom: 1px solid #202225; box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+        #sidebar { width: 240px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; transition: 0.3s; }
+        .server-header { height: 50px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-bottom: 1px solid var(--border); box-shadow: 0 1px 0 rgba(0,0,0,0.1); }
+        
+        /* SETTINGS ICON */
+        #settings-icon { cursor: pointer; color: var(--text-muted); font-size: 20px; transition: 0.2s; }
+        #settings-icon:hover { color: var(--text-main); transform: rotate(90deg); }
+
         .channel-list { padding: 10px 8px; flex-grow: 1; }
         .category { font-size: 12px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin: 10px 0 5px 8px; }
-        .channel { padding: 6px 8px; margin: 1px 0; border-radius: 4px; cursor: pointer; color: #8e9297; display: flex; align-items: center; }
-        .channel:hover { background-color: #34373c; color: var(--text-main); }
-        .channel.active { background-color: #393c43; color: white; }
+        .channel { padding: 6px 8px; margin: 1px 0; border-radius: 4px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; }
+        .channel:hover { background-color: var(--input-bg); color: var(--text-main); }
+        .channel.active { background-color: rgba(88, 101, 242, 0.3); color: var(--text-main); }
         .channel::before { content: '#'; margin-right: 6px; font-size: 20px; color: var(--text-muted); }
 
+        /* VOICE CHANNEL STYLE */
+        .voice-channel { color: var(--text-muted); cursor: pointer; padding: 6px 8px; border-radius: 4px; display: flex; align-items: center; }
+        .voice-channel::before { content: '🔊'; margin-right: 6px; font-size: 16px; }
+        .voice-channel:hover { background-color: var(--input-bg); color: var(--text-main); }
+        .voice-channel.connected { color: #3ba55c; font-weight: bold; }
+
         /* CHAT AREA */
-        #chat-area { flex-grow: 1; background-color: var(--bg-chat); display: flex; flex-direction: column; }
-        #chat-header { height: 50px; border-bottom: 1px solid #26272d; display: flex; align-items: center; padding: 0 16px; font-weight: bold; box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+        #chat-area { flex-grow: 1; background-color: var(--bg-chat); display: flex; flex-direction: column; transition: 0.3s; }
+        #chat-header { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; font-weight: bold; }
         #header-hash { color: var(--text-muted); margin-right: 8px; font-size: 24px; }
 
         #messages { flex-grow: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 15px; }
-        #messages::-webkit-scrollbar { width: 8px; background: #2e3338; }
-        #messages::-webkit-scrollbar-thumb { background: #202225; border-radius: 4px; }
+        #messages::-webkit-scrollbar { width: 8px; background: var(--bg-sidebar); }
+        #messages::-webkit-scrollbar-thumb { background: var(--bg-dark); border-radius: 4px; }
 
         .message { display: flex; margin-top: 5px; }
         .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 16px; background-color: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; flex-shrink: 0; }
         .msg-content { display: flex; flex-direction: column; }
         .msg-header { display: flex; align-items: baseline; gap: 8px; }
-        .username { font-weight: 500; color: white; cursor: pointer; }
+        .username { font-weight: 500; color: var(--text-main); cursor: pointer; }
         .timestamp { font-size: 12px; color: var(--text-muted); }
-        .text { margin-top: 4px; color: #dcddde; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
+        .text { margin-top: 4px; color: var(--text-main); line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
         
-        /* FILE ATTACHMENTS */
         .attachment-img { max-width: 300px; max-height: 300px; border-radius: 8px; margin-top: 5px; cursor: pointer; }
-        .attachment-file { background: #2f3136; padding: 10px; border-radius: 5px; margin-top: 5px; display: flex; align-items: center; color: var(--accent); text-decoration: none; width: fit-content; border: 1px solid #202225; }
-        .attachment-file:hover { background: #34373c; }
-
-        .system-msg { color: var(--text-muted); font-size: 14px; margin-left: 10px; display: flex; align-items: center; gap: 10px; }
-        .system-msg::before { content: '➜'; color: var(--accent); }
+        .attachment-file { background: var(--input-bg); padding: 10px; border-radius: 5px; margin-top: 5px; display: flex; align-items: center; color: var(--accent); text-decoration: none; width: fit-content; border: 1px solid var(--border); }
 
         /* INPUT AREA */
         #input-area { padding: 0 16px 24px; display: flex; gap: 10px; align-items: flex-start; }
         #input-wrapper { background-color: var(--input-bg); border-radius: 8px; padding: 0 16px; flex-grow: 1; display: flex; align-items: center; }
         #input-box { background: transparent; border: none; width: 100%; color: var(--text-main); font-size: 16px; outline: none; padding: 11px 0; }
-        
-        /* UPLOAD BUTTON */
-        #upload-btn { background: none; border: none; color: #b9bbbe; font-size: 24px; cursor: pointer; padding: 0 10px 0 0; display: flex; align-items: center; height: 44px; }
+        #upload-btn { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 0 10px 0 0; }
         #upload-btn:hover { color: var(--text-main); }
 
-        /* LOGIN SCREEN */
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #36393f; display: flex; align-items: center; justify-content: center; z-index: 999; }
-        .login-box { background: #2f3136; padding: 32px; border-radius: 5px; width: 480px; text-align: center; box-shadow: 0 2px 10px 0 rgba(0,0,0,0.2); }
-        .login-box h2 { color: white; margin-bottom: 8px; }
-        .login-box input { width: 90%; padding: 10px; margin-bottom: 20px; background: #202225; border: 1px solid #202225; color: white; border-radius: 3px; }
-        .login-box button { width: 95%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; }
+        /* MODALS (Login & Settings) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 999; }
+        .modal-box { background: var(--bg-sidebar); padding: 32px; border-radius: 5px; width: 400px; text-align: center; box-shadow: 0 2px 10px 0 rgba(0,0,0,0.5); }
+        .modal-box h2 { color: var(--text-main); margin-bottom: 20px; }
+        
+        .theme-btn { width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: left; background: var(--input-bg); color: var(--text-main); }
+        .theme-btn:hover { background-color: var(--bg-dark); }
+        
+        /* LOGIN SPECIFIC */
+        #username-input { width: 90%; padding: 10px; margin-bottom: 20px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 3px; }
+        .action-btn { width: 95%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; }
+        
+        /* VOICE STATUS */
+        #voice-controls { padding: 10px; background: var(--bg-dark); border-top: 1px solid var(--border); display: none; align-items: center; justify-content: space-between; }
+        .voice-status-text { color: #3ba55c; font-weight: bold; font-size: 12px; }
+        .disconnect-btn { background: none; border: none; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <!-- LOGIN -->
-    <div id="login-overlay">
-        <div class="login-box">
+    <div id="login-overlay" class="modal-overlay" style="display:flex;">
+        <div class="modal-box">
             <h2>Welcome to Chatcord</h2>
-            <div style="text-align: left; width: 90%; margin: 0 auto; color: #b9bbbe; font-size: 12px; font-weight: bold; margin-bottom: 8px;">USERNAME</div>
-            <input type="text" id="username-input" maxlength="15">
-            <button onclick="manualLogin()">Log In</button>
+            <input type="text" id="username-input" placeholder="Enter Username" maxlength="15">
+            <button class="action-btn" onclick="manualLogin()">Log In</button>
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- SETTINGS -->
+    <div id="settings-overlay" class="modal-overlay">
+        <div class="modal-box">
+            <h2>Appearance</h2>
+            <button class="theme-btn" onclick="setTheme('light')">☀️ Light Mode</button>
+            <button class="theme-btn" onclick="setTheme('normal')">🌑 Normal (Discord)</button>
+            <button class="theme-btn" onclick="setTheme('dark')">🖤 Dark (AMOLED)</button>
+            <br><br>
+            <button class="action-btn" style="background:#ed4245;" onclick="closeSettings()">Close</button>
+        </div>
+    </div>
+
+    <!-- APP -->
     <div id="app">
         <div id="sidebar">
-            <div class="server-header">Chatcord Community</div>
+            <div class="server-header">
+                <span>Chatcord</span>
+                <span id="settings-icon" onclick="openSettings()">⚙️</span>
+            </div>
             <div class="channel-list">
                 <div class="category">Text Channels</div>
                 <div class="channel active" onclick="switchChannel('general', this)">general</div>
-                <div class="channel" onclick="switchChannel('clips', this)">clips</div>
+                <div class="channel" onclick="switchChannel('gaming', this)">gaming</div>
                 <div class="channel" onclick="switchChannel('music', this)">music</div>
-                <div class="channel" onclick="switchChannel('memes', this)">memes</div>
+                
+                <div class="category">Voice Channels</div>
+                <div class="voice-channel" onclick="joinVoice('Lounge')">Lounge</div>
+            </div>
+            
+            <div id="voice-controls">
+                <div>
+                    <div style="color:var(--text-main); font-size:12px; font-weight:bold;">Voice Connected</div>
+                    <div class="voice-status-text">Lounge</div>
+                </div>
+                <button class="disconnect-btn" onclick="leaveVoice()">❌</button>
             </div>
         </div>
 
@@ -107,7 +175,6 @@
         </div>
     </div>
 
-    <!-- Hidden File Input -->
     <input type="file" id="file-input" style="display: none;" onchange="uploadFile()">
 
     <script src="/socket.io/socket.io.js"></script>
@@ -115,8 +182,21 @@
         const socket = io();
         let myUsername = "";
         
-        // --- 1. AUTO LOGIN LOGIC ---
+        // --- THEME LOGIC ---
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('chatcord_theme', theme);
+        }
+        function openSettings() { document.getElementById('settings-overlay').style.display = 'flex'; }
+        function closeSettings() { document.getElementById('settings-overlay').style.display = 'none'; }
+
+        // --- AUTH & INIT ---
         window.onload = () => {
+            // Load Theme
+            const savedTheme = localStorage.getItem('chatcord_theme') || 'normal';
+            setTheme(savedTheme);
+
+            // Load User
             const savedUser = localStorage.getItem('chatcord_user');
             if(savedUser) {
                 myUsername = savedUser;
@@ -129,14 +209,13 @@
             const name = document.getElementById('username-input').value.trim();
             if(name) {
                 myUsername = name;
-                localStorage.setItem('chatcord_user', name); // SAVE TO BROWSER
+                localStorage.setItem('chatcord_user', name);
                 document.getElementById('login-overlay').style.display = 'none';
                 socket.emit('join', myUsername);
             }
         }
-        document.getElementById('username-input').addEventListener("keypress", e => { if(e.key==="Enter") manualLogin(); });
 
-        // --- 2. MESSAGE HANDLING ---
+        // --- TEXT CHAT ---
         const input = document.getElementById('msg-input');
         input.addEventListener("keypress", e => {
             if (e.key === "Enter" && input.value.trim() !== "") {
@@ -147,28 +226,27 @@
 
         function renderMessage(data) {
             const box = document.getElementById('messages');
+            const div = document.createElement('div');
             
             if(data.type === 'system') {
-                const div = document.createElement('div');
-                div.className = 'system-msg';
-                div.innerText = data.text;
-                box.appendChild(div);
+                div.style.color = "var(--text-muted)";
+                div.style.fontSize = "12px";
+                div.style.marginLeft = "20px";
+                div.innerText = `➜ ${data.text}`;
             } else {
-                const div = document.createElement('div');
                 div.className = 'message';
-                
                 let hash = 0;
                 for (let i = 0; i < data.user.length; i++) hash = data.user.charCodeAt(i) + ((hash << 5) - hash);
-                const color = `hsl(${hash % 360}, 70%, 50%)`;
+                const color = `hsl(${hash % 360}, 60%, 50%)`;
 
                 let attachmentHtml = '';
                 if(data.file) {
                     const ext = data.file.filename.split('.').pop().toLowerCase();
                     const path = `/uploads/${data.file.filename}`;
                     if(['jpg','jpeg','png','gif','webp'].includes(ext)) {
-                        attachmentHtml = `<a href="${path}" target="_blank"><img src="${path}" class="attachment-img"></a>`;
+                        attachmentHtml = `<br><a href="${path}" target="_blank"><img src="${path}" class="attachment-img"></a>`;
                     } else {
-                        attachmentHtml = `<a href="${path}" target="_blank" class="attachment-file">📁 ${data.file.originalName}</a>`;
+                        attachmentHtml = `<br><a href="${path}" target="_blank" class="attachment-file">📁 ${data.file.originalName}</a>`;
                     }
                 }
 
@@ -179,68 +257,138 @@
                             <span class="username" style="color:${color}">${data.user}</span>
                             <span class="timestamp">${data.time}</span>
                         </div>
-                        <div class="text">${data.text}</div>
-                        ${attachmentHtml}
+                        <div class="text">${data.text} ${attachmentHtml}</div>
                     </div>
                 `;
-                box.appendChild(div);
             }
+            box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
 
-        // --- 3. SOCKET EVENTS ---
-        socket.on('message', (data) => renderMessage(data));
-        
-        socket.on('loadHistory', (history) => {
-            document.getElementById('messages').innerHTML = ''; // Clear first
-            history.forEach(msg => renderMessage(msg));
+        socket.on('message', renderMessage);
+        socket.on('loadHistory', h => { document.getElementById('messages').innerHTML=''; h.forEach(renderMessage); });
+        socket.on('channelSwitched', d => {
+            document.getElementById('messages').innerHTML = `<div style='padding:20px; color:var(--text-muted)'><h1>#${d.channel}</h1>Start of channel.</div>`;
+            d.history.forEach(renderMessage);
         });
 
-        window.switchChannel = function(channelName, el) {
+        window.switchChannel = function(name, el) {
             document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('header-name').innerText = channelName;
-            document.getElementById('msg-input').placeholder = `Message #${channelName}`;
-            socket.emit('switchChannel', channelName);
+            document.getElementById('header-name').innerText = name;
+            socket.emit('switchChannel', name);
         }
 
-        socket.on('channelSwitched', (data) => {
-            document.getElementById('messages').innerHTML = `
-                <div style="padding: 20px; margin-top: auto;">
-                    <div style="background:#40444b; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px; color:white; margin-bottom:10px;">#</div>
-                    <h1 style="color:white; margin:0;">Welcome to #${data.channel}!</h1>
-                    <p style="color:#b9bbbe;">This is the start of the #${data.channel} channel.</p>
-                </div>
-            `;
-            // Load history for this channel
-            data.history.forEach(msg => renderMessage(msg));
-        });
-
-        // --- 4. FILE UPLOAD LOGIC ---
         function uploadFile() {
-            const fileInput = document.getElementById('file-input');
-            const file = fileInput.files[0];
+            const file = document.getElementById('file-input').files[0];
             if(!file) return;
-
             const formData = new FormData();
             formData.append('file', file);
-
-            // Show uploading state?
-            input.placeholder = "Uploading...";
-
             fetch('/upload', { method: 'POST', body: formData })
-            .then(res => res.json())
-            .then(data => {
-                // Send file info to socket
-                socket.emit('chatMessage', { text: "", file: data });
-                input.placeholder = `Message #${document.getElementById('header-name').innerText}`;
-                fileInput.value = ''; // Reset
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Upload failed.");
-                input.placeholder = `Message #${document.getElementById('header-name').innerText}`;
+                .then(res => res.json())
+                .then(data => socket.emit('chatMessage', { text: "", file: data }));
+        }
+
+        // --- VOICE CHAT (WebRTC Mesh) ---
+        let localStream;
+        let peers = {}; // { socketId: RTCPeerConnection }
+        let currentVoiceRoom = null;
+
+        async function joinVoice(roomName) {
+            if(currentVoiceRoom) leaveVoice();
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                currentVoiceRoom = roomName;
+                
+                document.getElementById('voice-controls').style.display = 'flex';
+                document.querySelector('.voice-channel').classList.add('connected');
+                
+                socket.emit('joinVoice', roomName);
+            } catch(e) {
+                alert("Microphone access denied or not available.");
+                console.error(e);
+            }
+        }
+
+        function leaveVoice() {
+            if(localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            Object.values(peers).forEach(p => p.close());
+            peers = {};
+            currentVoiceRoom = null;
+            
+            document.getElementById('voice-controls').style.display = 'none';
+            document.querySelector('.voice-channel').classList.remove('connected');
+            socket.emit('leaveVoice');
+        }
+
+        // 1. Existing users in room call me
+        socket.on('voiceUsers', (users) => {
+            users.forEach(id => createPeer(id, true)); // I am initiator
+        });
+
+        // 2. Someone else joined, I wait for their offer
+        socket.on('voiceSignal', async (data) => {
+            if(!peers[data.from]) createPeer(data.from, false);
+            const peer = peers[data.from];
+            
+            if(data.signal.sdp) {
+                await peer.setRemoteDescription(new RTCSessionDescription(data.signal.sdp));
+                if(data.signal.sdp.type === 'offer') {
+                    const answer = await peer.createAnswer();
+                    await peer.setLocalDescription(answer);
+                    socket.emit('voiceSignal', { to: data.from, signal: { sdp: answer } });
+                }
+            } else if (data.signal.candidate) {
+                await peer.addIceCandidate(new RTCIceCandidate(data.signal.candidate));
+            }
+        });
+
+        socket.on('userLeftVoice', id => {
+            if(peers[id]) {
+                peers[id].close();
+                delete peers[id];
+                const audio = document.getElementById(`audio-${id}`);
+                if(audio) audio.remove();
+            }
+        });
+
+        function createPeer(targetId, initiator) {
+            const peer = new RTCPeerConnection({
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
             });
+            peers[targetId] = peer;
+
+            // Add local mic
+            localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+
+            // Handle incoming audio
+            peer.ontrack = (event) => {
+                let audio = document.getElementById(`audio-${targetId}`);
+                if(!audio) {
+                    audio = document.createElement('audio');
+                    audio.id = `audio-${targetId}`;
+                    audio.autoplay = true;
+                    document.body.appendChild(audio);
+                }
+                audio.srcObject = event.streams[0];
+            };
+
+            peer.onicecandidate = (event) => {
+                if(event.candidate) {
+                    socket.emit('voiceSignal', { to: targetId, signal: { candidate: event.candidate } });
+                }
+            };
+
+            if(initiator) {
+                peer.createOffer().then(offer => {
+                    peer.setLocalDescription(offer);
+                    socket.emit('voiceSignal', { to: targetId, signal: { sdp: offer } });
+                });
+            }
         }
     </script>
 </body>
