@@ -7,399 +7,445 @@
     <style>
         /* --- THEMES --- */
         :root {
-            --bg-dark: #202225;
-            --bg-sidebar: #2f3136;
-            --bg-chat: #36393f;
-            --bg-header: #36393f;
-            --text-main: #dcddde;
+            --bg-tertiary: #202225;
+            --bg-secondary: #2f3136;
+            --bg-primary: #36393f;
+            --header-primary: #ffffff;
+            --header-secondary: #b9bbbe;
+            --text-normal: #dcddde;
             --text-muted: #72767d;
-            --accent: #5865F2;
-            --input-bg: #40444b;
-            --border: #202225;
+            --interactive-normal: #b9bbbe;
+            --interactive-hover: #dcddde;
+            --interactive-active: #ffffff;
+            --background-modifier-hover: rgba(79,84,92,0.16);
+            --background-modifier-selected: rgba(79,84,92,0.32);
+            --brand-experiment: #5865F2;
+            --input-background: #40444b;
+            --green: #3ba55c;
+            --red: #ed4245;
         }
         [data-theme="light"] {
-            --bg-dark: #e3e5e8; --bg-sidebar: #f2f3f5; --bg-chat: #ffffff; --bg-header: #ffffff;
-            --text-main: #2e3338; --text-muted: #747f8d; --accent: #5865F2; --input-bg: #ebedef; --border: #e3e5e8;
-        }
-        [data-theme="dark"] {
-            --bg-dark: #000000; --bg-sidebar: #0a0a0a; --bg-chat: #111111; --bg-header: #111111;
-            --text-main: #eeeeee; --text-muted: #888888; --accent: #3ba55c; --input-bg: #222222; --border: #333333;
+            --bg-tertiary: #e3e5e8; --bg-secondary: #f2f3f5; --bg-primary: #ffffff;
+            --header-primary: #060607; --text-normal: #2e3338; --input-background: #ebedef;
         }
 
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Whitney', Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
-        #app { display: flex; height: 100vh; width: 100vw; position: relative; }
+        body { margin: 0; font-family: 'gg sans', 'Whitney', Helvetica, Arial, sans-serif; background: var(--bg-tertiary); color: var(--text-normal); overflow: hidden; }
+        #app { display: flex; height: 100vh; width: 100vw; }
 
         /* --- SIDEBAR --- */
         #sidebar { 
             width: 240px; 
-            background-color: var(--bg-sidebar); 
+            background-color: var(--bg-secondary); 
             display: flex; 
             flex-direction: column; 
-            transition: transform 0.3s ease;
-            z-index: 100;
-            border-right: 1px solid var(--border);
+            flex-shrink: 0;
         }
         
-        .server-header { height: 50px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-bottom: 1px solid var(--border); box-shadow: 0 1px 0 rgba(0,0,0,0.1); }
-        #settings-icon { cursor: pointer; color: var(--text-muted); font-size: 20px; transition: 0.2s; }
-        #settings-icon:hover { color: var(--text-main); transform: rotate(90deg); }
+        .server-header { 
+            height: 48px; padding: 0 16px; display: flex; align-items: center; 
+            font-weight: bold; border-bottom: 1px solid #202225; 
+            color: var(--header-primary); box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+            font-size: 16px;
+        }
 
-        .channel-list { padding: 10px 8px; flex-grow: 1; overflow-y: auto; }
-        .category { font-size: 12px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin: 10px 0 5px 8px; }
-        .channel { padding: 8px; margin: 2px 0; border-radius: 4px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; font-size: 16px; }
-        .channel:hover { background-color: var(--input-bg); color: var(--text-main); }
-        .channel.active { background-color: rgba(88, 101, 242, 0.3); color: var(--text-main); }
-        .channel::before { content: '#'; margin-right: 6px; font-size: 20px; color: var(--text-muted); }
+        .channel-list { padding: 8px; flex-grow: 1; overflow-y: auto; }
         
-        .voice-channel { color: var(--text-muted); cursor: pointer; padding: 8px; border-radius: 4px; display: flex; align-items: center; }
-        .voice-channel::before { content: '🔊'; margin-right: 6px; font-size: 16px; }
-        .voice-channel:hover { background-color: var(--input-bg); color: var(--text-main); }
-        .voice-channel.connected { color: #3ba55c; font-weight: bold; }
+        .category { 
+            font-size: 12px; color: var(--text-muted); font-weight: 700; 
+            text-transform: uppercase; margin: 16px 8px 4px 16px; 
+            display: flex; align-items: center; cursor: pointer;
+        }
+        .category:hover { color: var(--interactive-hover); }
+
+        .channel { 
+            padding: 6px 8px; margin: 1px 0; border-radius: 4px; cursor: pointer; 
+            color: var(--text-muted); display: flex; align-items: center; font-weight: 500;
+        }
+        .channel:hover { background-color: var(--background-modifier-hover); color: var(--interactive-hover); }
+        .channel.active { background-color: var(--background-modifier-selected); color: var(--header-primary); }
+        .channel-icon { width: 20px; text-align: center; margin-right: 6px; font-size: 18px; color: #8e9297; }
+        
+        /* VOICE LIST STYLES */
+        .voice-users { margin-left: 28px; margin-bottom: 5px; }
+        .voice-user { display: flex; align-items: center; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .voice-user:hover { background-color: var(--background-modifier-hover); }
+        .voice-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-experiment); margin-right: 8px; background-size: cover; position: relative; }
+        .voice-name { font-size: 14px; color: var(--header-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Speaking Ring */
+        .voice-user.speaking .voice-avatar { box-shadow: 0 0 0 2px var(--green); }
+
+        /* USER DOCK (Bottom) */
+        #panels { background-color: #292b2f; flex-shrink: 0; }
+        
+        /* Connection Status Panel */
+        #connection-panel {
+            padding: 8px; border-bottom: 1px solid #3f4147;
+            display: none; /* Hidden until connected */
+        }
+        .conn-text { color: var(--green); font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+        .conn-channel { color: var(--header-primary); font-size: 12px; }
+        .conn-btn { float: right; background: none; border: none; color: var(--text-normal); cursor: pointer; font-weight: bold; }
+
+        /* User Info Panel */
+        #user-dock {
+            height: 52px; padding: 0 8px; display: flex; align-items: center; background: #292b2f;
+        }
+        .dock-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-experiment); margin-right: 8px; background-size: cover; cursor: pointer; position: relative; }
+        .dock-avatar:hover { opacity: 0.8; }
+        .dock-avatar::after { content:''; position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; background: var(--green); border-radius: 50%; border: 3px solid #292b2f; }
+        
+        .dock-info { flex-grow: 1; font-size: 13px; line-height: 1.2; overflow: hidden; cursor: pointer; }
+        .dock-name { font-weight: bold; color: var(--header-primary); white-space: nowrap; }
+        .dock-discrim { font-size: 11px; color: var(--header-secondary); }
+        
+        .dock-buttons { display: flex; }
+        .dock-btn { width: 32px; height: 32px; border-radius: 4px; background: none; border: none; color: var(--text-normal); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .dock-btn:hover { background-color: var(--background-modifier-hover); }
+        .dock-btn.off { color: var(--red); position: relative; }
+        .dock-btn.off::after { content:''; position: absolute; width: 2px; height: 20px; background: var(--red); transform: rotate(45deg); }
 
         /* --- CHAT AREA --- */
-        #chat-area { flex-grow: 1; background-color: var(--bg-chat); display: flex; flex-direction: column; min-width: 0; }
-        #chat-header { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; font-weight: bold; background: var(--bg-header); flex-shrink: 0; }
-        #header-hash { color: var(--text-muted); margin-right: 8px; font-size: 24px; }
+        #chat-area { flex-grow: 1; background-color: var(--bg-primary); display: flex; flex-direction: column; min-width: 0; }
+        #chat-header { height: 48px; border-bottom: 1px solid #26272d; display: flex; align-items: center; padding: 0 16px; font-weight: bold; flex-shrink: 0; }
+        #header-hash { color: var(--text-muted); margin-right: 8px; font-size: 24px; font-weight: 300; }
         
-        /* Mobile Menu Button */
-        #menu-btn { display: none; margin-right: 15px; font-size: 24px; color: var(--text-main); background: none; border: none; cursor: pointer; }
+        #messages { flex-grow: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; }
+        #messages::-webkit-scrollbar { width: 8px; background: #2e3338; }
+        #messages::-webkit-scrollbar-thumb { background: #202225; border-radius: 4px; }
 
-        #messages { flex-grow: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-        #messages::-webkit-scrollbar { width: 8px; background: var(--bg-sidebar); }
-        #messages::-webkit-scrollbar-thumb { background: var(--bg-dark); border-radius: 4px; }
-
-        .message { display: flex; margin-top: 5px; max-width: 100%; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 16px; background-color: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; flex-shrink: 0; background-size: cover; background-position: center; }
-        .msg-content { display: flex; flex-direction: column; min-width: 0; }
-        .msg-header { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-        .username { font-weight: 500; color: var(--text-main); cursor: pointer; }
+        .message { display: flex; margin-top: 16px; }
+        .message:hover { background-color: rgba(4,4,5,0.02); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 16px; background-color: var(--brand-experiment); flex-shrink: 0; background-size: cover; cursor: pointer; }
+        .msg-header { display: flex; align-items: baseline; gap: 8px; }
+        .username { font-weight: 500; color: var(--header-primary); cursor: pointer; }
+        .username:hover { text-decoration: underline; }
         .timestamp { font-size: 12px; color: var(--text-muted); }
-        .text { margin-top: 4px; color: var(--text-main); line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+        .text { margin-top: 4px; color: var(--text-normal); line-height: 1.375rem; white-space: pre-wrap; word-wrap: break-word; }
         
-        .attachment-img { max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 5px; cursor: pointer; }
-        .attachment-file { background: var(--input-bg); padding: 10px; border-radius: 5px; margin-top: 5px; display: flex; align-items: center; color: var(--accent); text-decoration: none; width: fit-content; border: 1px solid var(--border); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .attachment-img { max-width: 300px; max-height: 300px; border-radius: 8px; margin-top: 5px; cursor: pointer; }
 
-        /* --- INPUT AREA --- */
-        #input-area { padding: 10px 16px 20px 16px; display: flex; gap: 10px; align-items: flex-end; background: var(--bg-chat); flex-shrink: 0; }
-        #input-wrapper { background-color: var(--input-bg); border-radius: 20px; padding: 5px 15px; flex-grow: 1; display: flex; align-items: center; min-height: 44px; }
-        #input-box { background: transparent; border: none; width: 100%; color: var(--text-main); font-size: 16px; outline: none; padding: 8px 0; }
-        
-        /* Buttons */
-        #upload-btn { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 0 10px 0 0; display: flex; align-items: center; }
-        #send-btn { background: none; border: none; color: var(--accent); font-size: 20px; cursor: pointer; padding: 0 0 0 10px; display: flex; align-items: center; }
-        #send-btn:hover { color: white; }
-
-        /* --- MOBILE OPTIMIZATION --- */
-        #mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
-
-        @media (max-width: 768px) {
-            #sidebar { position: fixed; height: 100%; left: -240px; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
-            #sidebar.open { transform: translateX(240px); }
-            #menu-btn { display: block; }
-            #mobile-overlay.active { display: block; }
-            #input-wrapper { padding-left: 10px; }
-            .message { font-size: 15px; }
-        }
+        /* INPUT */
+        #input-area { padding: 0 16px 24px; flex-shrink: 0; }
+        #input-wrapper { background-color: var(--input-background); border-radius: 8px; padding: 0 16px; display: flex; align-items: center; }
+        #input-box { background: transparent; border: none; width: 100%; color: var(--text-normal); font-size: 16px; padding: 11px 0; outline: none; }
+        #upload-btn { background: none; border: none; color: var(--interactive-normal); font-size: 24px; cursor: pointer; padding-right: 16px; }
+        #upload-btn:hover { color: var(--interactive-hover); }
 
         /* MODALS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 999; }
-        .modal-box { background: var(--bg-sidebar); padding: 32px; border-radius: 5px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 2px 10px 0 rgba(0,0,0,0.5); }
-        .modal-box h2 { color: var(--text-main); margin-bottom: 20px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-box { background: var(--bg-primary); padding: 20px; border-radius: 5px; width: 400px; text-align: center; }
+        .modal-box input { width: 100%; padding: 10px; background: var(--input-background); border: none; color: white; margin-bottom: 10px; border-radius: 3px; }
+        .btn { padding: 10px 20px; background: var(--brand-experiment); border: none; color: white; border-radius: 3px; cursor: pointer; font-weight: bold; }
         
-        .section-title { text-align: left; color: var(--text-muted); font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; margin-top: 20px; }
-        .settings-input { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 3px; margin-bottom: 10px; box-sizing: border-box; }
-        
-        .theme-btn { width: 100%; padding: 15px; margin: 2px 0; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; background: var(--input-bg); color: var(--text-main); text-align: left; }
-        .action-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 16px; }
-        
-        .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px auto; background-size: cover; background-position: center; border: 3px solid var(--bg-chat); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; }
-
-        #voice-controls { padding: 10px; background: var(--bg-dark); border-top: 1px solid var(--border); display: none; align-items: center; justify-content: space-between; }
-        .disconnect-btn { background: none; border: none; font-size: 16px; cursor: pointer; }
+        /* Mobile Overlay */
+        #mobile-menu { display: none; margin-right: 15px; background:none; border:none; color:white; font-size:24px; }
+        @media (max-width: 768px) {
+            #sidebar { position: fixed; height: 100%; left: -240px; z-index: 200; box-shadow: 2px 0 5px black; }
+            #sidebar.open { transform: translateX(240px); }
+            #mobile-menu { display: block; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY FOR MOBILE -->
-    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
-
-    <!-- LOGIN -->
+    <!-- MODALS -->
     <div id="login-overlay" class="modal-overlay" style="display:flex;">
         <div class="modal-box">
-            <h2>Welcome</h2>
-            <input type="text" id="login-input" placeholder="Username" class="settings-input" maxlength="15">
-            <button class="action-btn" onclick="manualLogin()">Log In</button>
+            <h2>Welcome back!</h2>
+            <p style="color:#aaa; margin-bottom:20px;">We're so excited to see you again!</p>
+            <input type="text" id="login-input" placeholder="Enter Username" maxlength="15">
+            <button class="btn" onclick="login()">Log In</button>
         </div>
     </div>
 
-    <!-- SETTINGS -->
     <div id="settings-overlay" class="modal-overlay">
         <div class="modal-box" style="text-align: left;">
-            <h2 style="text-align: center;">Settings</h2>
-            
-            <div class="section-title">My Profile</div>
-            <div id="settings-avatar" class="avatar-preview" onclick="document.getElementById('avatar-upload').click()"></div>
-            <input type="file" id="avatar-upload" style="display: none;" onchange="uploadAvatar()">
-            <input type="text" id="settings-name" class="settings-input" placeholder="Nickname">
-            <button class="action-btn" style="background:#3ba55c; margin-top:0;" onclick="saveProfile()">Save Profile</button>
-
-            <div class="section-title">Theme</div>
-            <button class="theme-btn" onclick="setTheme('light')">☀️ Light</button>
-            <button class="theme-btn" onclick="setTheme('normal')">🌑 Normal</button>
-            <button class="theme-btn" onclick="setTheme('dark')">🖤 Dark</button>
-
-            <button class="action-btn" style="background:#ed4245; margin-top: 20px;" onclick="closeSettings()">Close</button>
+            <h2 style="margin-bottom:20px;">My Account</h2>
+            <div style="text-align:center; margin-bottom:20px;">
+                <div id="settings-avatar" style="width:80px; height:80px; border-radius:50%; background:var(--brand-experiment); margin:0 auto; background-size:cover; cursor:pointer;" onclick="document.getElementById('avatar-upload').click()"></div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:5px;">Click to change avatar</div>
+            </div>
+            <label style="color:#aaa; font-size:12px; font-weight:bold;">USERNAME</label>
+            <input type="text" id="settings-name">
+            <label style="color:#aaa; font-size:12px; font-weight:bold; margin-top:10px; display:block;">THEME</label>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn" style="background:#2f3136;" onclick="setTheme('light')">☀️</button>
+                <button class="btn" style="background:#2f3136;" onclick="setTheme('normal')">🌑</button>
+                <button class="btn" style="background:#2f3136;" onclick="setTheme('dark')">🖤</button>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <button class="btn" style="background:var(--green);" onclick="saveProfile()">Save</button>
+                <button class="btn" style="background:transparent; color:#ed4245;" onclick="closeSettings()">Close</button>
+            </div>
         </div>
     </div>
 
-    <!-- APP -->
+    <!-- MAIN APP -->
     <div id="app">
-        <!-- SIDEBAR -->
         <div id="sidebar">
-            <div class="server-header">
-                <span>Chatcord</span>
-                <span id="settings-icon" onclick="openSettings()">⚙️</span>
-            </div>
+            <div class="server-header">Chatcord Community</div>
             <div class="channel-list">
-                <div class="category">Text Channels</div>
-                <div class="channel active" onclick="switchChannel('general', this)">general</div>
-                <div class="channel" onclick="switchChannel('gaming', this)">gaming</div>
-                <div class="channel" onclick="switchChannel('memes', this)">memes</div>
-                <div class="category">Voice Channels</div>
-                <div class="voice-channel" onclick="joinVoice('Lounge')">Lounge</div>
+                <div class="category">TEXT CHANNELS</div>
+                <div class="channel active" onclick="switchChannel('general', this)"><span class="channel-icon">#</span> general</div>
+                <div class="channel" onclick="switchChannel('clips', this)"><span class="channel-icon">#</span> clips</div>
+                <div class="channel" onclick="switchChannel('music', this)"><span class="channel-icon">#</span> music</div>
+                <div class="channel" onclick="switchChannel('memes', this)"><span class="channel-icon">#</span> memes</div>
+                
+                <div class="category">VOICE CHANNELS</div>
+                <!-- Lounge -->
+                <div class="channel" onclick="joinVoice('Lounge')">
+                    <span class="channel-icon">🔊</span> Lounge
+                </div>
+                <div id="voice-list-Lounge" class="voice-users"></div>
+                
+                <!-- Gaming -->
+                <div class="channel" onclick="joinVoice('Gaming')">
+                    <span class="channel-icon">🔊</span> Gaming
+                </div>
+                <div id="voice-list-Gaming" class="voice-users"></div>
             </div>
-            <div id="voice-controls">
-                <div style="color:#3ba55c; font-weight:bold;">Voice Connected</div>
-                <button class="disconnect-btn" onclick="leaveVoice()">❌</button>
+
+            <!-- BOTTOM DOCK -->
+            <div id="panels">
+                <div id="connection-panel">
+                    <div class="conn-text">Voice Connected</div>
+                    <div class="conn-channel" id="conn-channel-name">Lounge</div>
+                    <button class="conn-btn" onclick="leaveVoice()">Disconnect</button>
+                </div>
+                <div id="user-dock">
+                    <div class="dock-avatar" id="dock-avatar" onclick="openSettings()"></div>
+                    <div class="dock-info" onclick="openSettings()">
+                        <div class="dock-name" id="dock-name">User</div>
+                        <div class="dock-discrim">#0001</div>
+                    </div>
+                    <div class="dock-buttons">
+                        <button id="btn-mic" class="dock-btn" onclick="toggleMic()">🎤</button>
+                        <button id="btn-deaf" class="dock-btn" onclick="toggleDeafen()">🎧</button>
+                        <button class="dock-btn" onclick="openSettings()">⚙️</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- CHAT -->
         <div id="chat-area">
             <div id="chat-header">
-                <button id="menu-btn" onclick="toggleSidebar()">☰</button>
-                <span id="header-hash">#</span> 
-                <span id="header-name">general</span>
+                <button id="mobile-menu" onclick="toggleMobile()">☰</button>
+                <span id="header-hash">#</span> <span id="header-name">general</span>
             </div>
             <div id="messages"></div>
             <div id="input-area">
                 <div id="input-wrapper">
-                    <button id="upload-btn" onclick="document.getElementById('file-input').click()">+</button>
+                    <button id="upload-btn" onclick="document.getElementById('file-upload').click()">+</button>
                     <input type="text" id="msg-input" placeholder="Message #general" autocomplete="off">
-                    <button id="send-btn" onclick="sendMessage()">➤</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <input type="file" id="file-input" style="display: none;" onchange="uploadFile()">
+    <!-- Hidden Inputs -->
+    <input type="file" id="file-upload" style="display:none;" onchange="uploadFile()">
+    <input type="file" id="avatar-upload" style="display:none;" onchange="uploadAvatar()">
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let myUser = { name: "", avatar: null };
-
-        // --- AUTH & INIT ---
+        let me = { name: "", avatar: null };
+        let micOn = true;
+        let deafOn = false;
+        
+        // --- AUTH ---
         window.onload = () => {
-            const theme = localStorage.getItem('chatcord_theme') || 'normal';
-            setTheme(theme);
-            const savedName = localStorage.getItem('chatcord_name');
-            const savedAvatar = localStorage.getItem('chatcord_avatar');
-            if(savedName) {
-                myUser.name = savedName;
-                myUser.avatar = savedAvatar;
+            setTheme(localStorage.getItem('chatcord_theme') || 'normal');
+            const saved = localStorage.getItem('chatcord_user');
+            if(saved) {
+                me.name = saved;
+                me.avatar = localStorage.getItem('chatcord_avatar');
                 document.getElementById('login-overlay').style.display = 'none';
-                socket.emit('join', myUser);
+                startApp();
             }
         };
 
-        function manualLogin() {
-            const name = document.getElementById('login-input').value.trim();
-            if(name) {
-                myUser.name = name;
-                localStorage.setItem('chatcord_name', name);
+        function login() {
+            const val = document.getElementById('login-input').value.trim();
+            if(val) {
+                me.name = val;
+                localStorage.setItem('chatcord_user', val);
                 document.getElementById('login-overlay').style.display = 'none';
-                socket.emit('join', myUser);
+                startApp();
             }
         }
 
-        // --- MOBILE UI LOGIC ---
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('mobile-overlay');
-            if(sb.classList.contains('open')) {
-                sb.classList.remove('open');
-                ov.classList.remove('active');
-            } else {
-                sb.classList.add('open');
-                ov.classList.add('active');
-            }
+        function startApp() {
+            socket.emit('join', me);
+            updateDock();
         }
 
-        // --- SETTINGS & PROFILE ---
+        // --- DOCK & SETTINGS ---
+        function updateDock() {
+            document.getElementById('dock-name').innerText = me.name;
+            if(me.avatar) document.getElementById('dock-avatar').style.backgroundImage = `url('${me.avatar}')`;
+            else document.getElementById('dock-avatar').style.backgroundColor = "var(--brand-experiment)";
+        }
+
         function openSettings() {
             document.getElementById('settings-overlay').style.display = 'flex';
-            document.getElementById('settings-name').value = myUser.name;
-            updateAvatarPreview(myUser.avatar);
+            document.getElementById('settings-name').value = me.name;
+            if(me.avatar) document.getElementById('settings-avatar').style.backgroundImage = `url('${me.avatar}')`;
         }
         function closeSettings() { document.getElementById('settings-overlay').style.display = 'none'; }
-        
-        function updateAvatarPreview(url) {
-            const el = document.getElementById('settings-avatar');
-            if(url) {
-                el.style.backgroundImage = `url('${url}')`;
-                el.innerText = '';
-            } else {
-                el.style.backgroundImage = 'none';
-                el.innerText = myUser.name[0]?.toUpperCase() || '?';
-            }
-        }
 
         function uploadAvatar() {
             const file = document.getElementById('avatar-upload').files[0];
             if(!file) return;
-            const formData = new FormData();
-            formData.append('file', file);
-            fetch('/upload', { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    const url = `/uploads/${data.filename}`;
-                    updateAvatarPreview(url);
-                    document.getElementById('settings-avatar').dataset.tempUrl = url;
-                });
+            const fd = new FormData(); fd.append('file', file);
+            fetch('/upload', {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
+                const url = `/uploads/${d.filename}`;
+                document.getElementById('settings-avatar').style.backgroundImage = `url('${url}')`;
+                document.getElementById('settings-avatar').dataset.url = url;
+            });
         }
 
         function saveProfile() {
-            const newName = document.getElementById('settings-name').value.trim();
-            const tempUrl = document.getElementById('settings-avatar').dataset.tempUrl;
-            
-            if(newName) {
-                myUser.name = newName;
-                localStorage.setItem('chatcord_name', newName);
-            }
-            if(tempUrl) {
-                myUser.avatar = tempUrl;
-                localStorage.setItem('chatcord_avatar', tempUrl);
-            }
-
-            socket.emit('updateProfile', myUser);
+            const n = document.getElementById('settings-name').value.trim();
+            const u = document.getElementById('settings-avatar').dataset.url;
+            if(n) { me.name = n; localStorage.setItem('chatcord_user', n); }
+            if(u) { me.avatar = u; localStorage.setItem('chatcord_avatar', u); }
+            socket.emit('updateProfile', me);
+            updateDock();
             closeSettings();
         }
 
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('chatcord_theme', theme);
+        function setTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('chatcord_theme', t);
         }
 
-        // --- CHAT LOGIC ---
+        // --- CHAT ---
         const input = document.getElementById('msg-input');
-        input.addEventListener("keypress", e => { if(e.key === "Enter") sendMessage(); });
-
-        function sendMessage() {
-            if (input.value.trim() !== "") {
+        input.addEventListener("keypress", e => {
+            if (e.key === "Enter" && input.value.trim() !== "") {
                 socket.emit('chatMessage', { text: input.value });
                 input.value = "";
-                input.focus();
             }
-        }
+        });
 
-        function renderMessage(data) {
+        socket.on('message', data => {
             const box = document.getElementById('messages');
             const div = document.createElement('div');
-            
             if(data.type === 'system') {
-                div.style.color = "var(--text-muted)";
-                div.style.fontSize = "12px";
-                div.style.marginLeft = "20px";
+                div.style = "color:#72767d; font-size:12px; margin:10px 0 0 20px;";
                 div.innerText = `➜ ${data.text}`;
             } else {
                 div.className = 'message';
-                
-                let avatarHTML = '';
-                if(data.avatar) {
-                    avatarHTML = `<div class="avatar" style="background-image:url('${data.avatar}')"></div>`;
-                } else {
-                    let hash = 0;
-                    for (let i = 0; i < data.user.length; i++) hash = data.user.charCodeAt(i) + ((hash << 5) - hash);
-                    const color = `hsl(${hash % 360}, 70%, 50%)`;
-                    avatarHTML = `<div class="avatar" style="background-color:${color}">${data.user[0].toUpperCase()}</div>`;
-                }
-
-                let fileHTML = '';
+                let av = data.avatar ? `url('${data.avatar}')` : 'var(--brand-experiment)';
+                let style = data.avatar ? `background-image:${av}` : `background:${av}`;
+                let att = '';
                 if(data.file) {
-                    const path = `/uploads/${data.file.filename}`;
-                    if(data.file.filename.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-                        fileHTML = `<br><a href="${path}" target="_blank"><img src="${path}" class="attachment-img"></a>`;
-                    } else {
-                        fileHTML = `<br><a href="${path}" target="_blank" class="attachment-file">📁 ${data.file.originalName}</a>`;
-                    }
+                    const p = `/uploads/${data.file.filename}`;
+                    if(data.file.filename.match(/\.(jpg|png|gif)$/i)) att = `<br><a href="${p}" target="_blank"><img src="${p}" class="attachment-img"></a>`;
+                    else att = `<br><a href="${p}" target="_blank" class="attachment-file">📁 ${data.file.originalName}</a>`;
                 }
-
                 div.innerHTML = `
-                    ${avatarHTML}
+                    <div class="avatar" style="${style}"></div>
                     <div class="msg-content">
                         <div class="msg-header">
                             <span class="username">${data.user}</span>
                             <span class="timestamp">${data.time}</span>
                         </div>
-                        <div class="text">${data.text} ${fileHTML}</div>
+                        <div class="text">${data.text} ${att}</div>
                     </div>
                 `;
             }
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
-        }
+        });
 
-        socket.on('message', renderMessage);
-        socket.on('loadHistory', h => { document.getElementById('messages').innerHTML=''; h.forEach(renderMessage); });
-        socket.on('channelSwitched', d => {
-            document.getElementById('messages').innerHTML = `<div style='padding:20px; color:var(--text-muted)'><h1>#${d.channel}</h1>Start of channel.</div>`;
-            d.history.forEach(renderMessage);
+        socket.on('loadHistory', h => { document.getElementById('messages').innerHTML=''; h.forEach(msg => { socket.emit('fake', msg); /* Hack to reuse logic, actually easier to call render */ }); });
+        // Correct way for history loading
+        socket.on('loadHistory', h => {
+            const box = document.getElementById('messages');
+            box.innerHTML = '';
+            h.forEach(data => {
+                // ...Reuse render logic (copy paste render block or make function)...
+                // Simulating socket event for simplicity
+                const div = document.createElement('div');
+                div.className = 'message';
+                let av = data.avatar ? `url('${data.avatar}')` : 'var(--brand-experiment)';
+                let style = data.avatar ? `background-image:${av}` : `background:${av}`;
+                div.innerHTML = `
+                    <div class="avatar" style="${style}"></div>
+                    <div class="msg-content">
+                        <div class="msg-header"><span class="username">${data.user}</span><span class="timestamp">${data.time}</span></div>
+                        <div class="text">${data.text}</div>
+                    </div>`;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
         });
 
         window.switchChannel = (n, el) => {
             document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             document.getElementById('header-name').innerText = n;
-            document.getElementById('msg-input').placeholder = `Message #${n}`;
             socket.emit('switchChannel', n);
-            // On mobile, close sidebar
-            if(window.innerWidth <= 768) toggleSidebar();
+            if(window.innerWidth <= 768) toggleMobile();
         }
 
         function uploadFile() {
-            const file = document.getElementById('file-input').files[0];
-            if(!file) return;
-            const formData = new FormData();
-            formData.append('file', file);
-            fetch('/upload', { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => socket.emit('chatMessage', { text: "", file: data }));
+            const f = document.getElementById('file-upload').files[0];
+            if(!f) return;
+            const fd = new FormData(); fd.append('file', f);
+            fetch('/upload', {method:'POST', body:fd}).then(r=>r.json()).then(d=>socket.emit('chatMessage', {text:"", file:d}));
         }
 
         // --- VOICE ---
-        let localStream, peers = {}, currentRoom = null;
+        let localStream, peers = {}, currentRoom = null, audioCtx, analyser;
+        
         async function joinVoice(room) {
             if(currentRoom) leaveVoice();
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                setupAudioAnalysis(localStream);
                 currentRoom = room;
-                document.getElementById('voice-controls').style.display = 'flex';
-                // On mobile, close menu so they see they joined
-                if(window.innerWidth <= 768) toggleSidebar();
+                document.getElementById('connection-panel').style.display = 'block';
+                document.getElementById('conn-channel-name').innerText = room;
                 socket.emit('joinVoice', room);
-            } catch(e) { alert("Mic required for voice."); }
+            } catch(e) { alert("Mic required."); }
         }
+
         function leaveVoice() {
             if(localStream) localStream.getTracks().forEach(t => t.stop());
             Object.values(peers).forEach(p => p.close());
             peers = {};
             currentRoom = null;
-            document.getElementById('voice-controls').style.display = 'none';
+            document.getElementById('connection-panel').style.display = 'none';
             socket.emit('leaveVoice');
         }
-        socket.on('voiceUsers', u => u.forEach(id => createPeer(id, true)));
+
+        // Render Voice Lists
+        socket.on('voiceUpdate', (state) => {
+            // Clear all lists
+            document.querySelectorAll('.voice-users').forEach(el => el.innerHTML = '');
+            
+            Object.keys(state).forEach(room => {
+                const list = document.getElementById(`voice-list-${room}`);
+                if(list) {
+                    state[room].forEach(u => {
+                        const div = document.createElement('div');
+                        div.className = 'voice-user';
+                        div.id = `v-user-${u.id}`;
+                        let av = u.avatar ? `background-image:url('${u.avatar}')` : '';
+                        div.innerHTML = `<div class="voice-avatar" style="${av}"></div><div class="voice-name">${u.name}</div>`;
+                        list.appendChild(div);
+                    });
+                }
+            });
+        });
+
+        // WebRTC logic (Standard Mesh)
+        socket.on('voicePeers', p => p.forEach(id => createPeer(id, true)));
         socket.on('voiceSignal', async d => {
             if(!peers[d.from]) createPeer(d.from, false);
             const p = peers[d.from];
@@ -412,19 +458,55 @@
                 }
             } else if(d.signal.candidate) p.addIceCandidate(new RTCIceCandidate(d.signal.candidate));
         });
-        socket.on('userLeftVoice', id => { if(peers[id]) { peers[id].close(); delete peers[id]; } });
         
         function createPeer(id, init) {
             const p = new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
             peers[id] = p;
             localStream.getTracks().forEach(t => p.addTrack(t, localStream));
             p.ontrack = e => {
-                let aud = document.getElementById(`aud-${id}`);
-                if(!aud) { aud=document.createElement('audio'); aud.id=`aud-${id}`; aud.autoplay=true; document.body.appendChild(aud); }
+                const aud = document.createElement('audio');
                 aud.srcObject = e.streams[0];
+                aud.autoplay = true;
+                document.body.appendChild(aud);
             };
             p.onicecandidate = e => { if(e.candidate) socket.emit('voiceSignal',{to:id, signal:{candidate:e.candidate}}); };
             if(init) p.createOffer().then(o => { p.setLocalDescription(o); socket.emit('voiceSignal',{to:id, signal:{sdp:o}}); });
+        }
+
+        // Speaking Detection (Visual)
+        function setupAudioAnalysis(stream) {
+            if(!audioCtx) audioCtx = new AudioContext();
+            const src = audioCtx.createMediaStreamSource(stream);
+            analyser = audioCtx.createAnalyser();
+            src.connect(analyser);
+            analyser.fftSize = 256;
+            const buffer = new Uint8Array(analyser.frequencyBinCount);
+            
+            setInterval(() => {
+                analyser.getByteFrequencyData(buffer);
+                const vol = buffer.reduce((a,b)=>a+b) / buffer.length;
+                const myAv = document.querySelector(`#v-user-${socket.id}`);
+                if(myAv) {
+                    if(vol > 20) myAv.classList.add('speaking');
+                    else myAv.classList.remove('speaking');
+                }
+            }, 100);
+        }
+
+        function toggleMic() {
+            micOn = !micOn;
+            localStream.getAudioTracks()[0].enabled = micOn;
+            document.getElementById('btn-mic').classList.toggle('off', !micOn);
+        }
+        function toggleDeafen() {
+            deafOn = !deafOn;
+            document.querySelectorAll('audio').forEach(a => a.muted = deafOn);
+            document.getElementById('btn-deaf').classList.toggle('off', deafOn);
+        }
+
+        function toggleMobile() {
+            const sb = document.getElementById('sidebar');
+            sb.style.transform = sb.style.transform === 'translateX(0px)' ? 'translateX(-240px)' : 'translateX(0px)';
         }
     </script>
 </body>
