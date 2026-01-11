@@ -160,6 +160,12 @@ io.on('connection', (socket) => {
         
         // Refresh Voice UI for everyone (in case this user reconnects)
         io.emit('voiceUpdate', getVoiceStateFull());
+        
+        // Update online count for everyone
+        io.emit('onlineCount', Object.keys(users).length);
+        
+        // Also update on initial connection for this user
+        socket.emit('onlineCount', Object.keys(users).length);
     });
 
     // 2. PROFILE
@@ -408,6 +414,9 @@ io.on('connection', (socket) => {
         }
         delete users[socket.id];
         io.emit('voiceUpdate', getVoiceStateFull());
+        
+        // Update online count for everyone
+        io.emit('onlineCount', Object.keys(users).length);
         
         // Save persistent data on disconnect
         savePersistentData();

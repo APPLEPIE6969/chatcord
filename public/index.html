@@ -138,7 +138,29 @@
             color: var(--header-primary); 
         }
 
-        .voice-users { margin-left: 28px; margin-bottom: 5px; }
+        .online-counter {
+            padding: 8px 12px;
+            margin: 8px 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            color: var(--text-normal);
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
         .voice-user { display: flex; align-items: center; padding: 4px 8px; border-radius: 4px; }
         .voice-avatar { 
             width: 24px; height: 24px; border-radius: 50%; 
@@ -818,6 +840,11 @@
                 <div class="category">Global Chat</div>
                 <div class="channel active"><span class="channel-icon">#</span>global</div>
                 
+                <div class="online-counter">
+                    <div class="online-dot"></div>
+                    <span id="online-count">0</span> users online
+                </div>
+                
                 <div class="category">Voice Channels</div>
                 <div class="channel" onclick="joinVoice('Lounge')"><span class="channel-icon">🔊</span>Lounge</div>
                 <div id="voice-list-Lounge" class="voice-users"></div>
@@ -1471,6 +1498,13 @@
             document.getElementById('dock-name').innerText = me.name;
             if(me.avatar) document.getElementById('dock-avatar').style.backgroundImage = `url('${me.avatar}')`;
         }
+
+        // --- ONLINE COUNTER ---
+        function updateOnlineCount(count) {
+            document.getElementById('online-count').innerText = count;
+        }
+
+        socket.on('onlineCount', updateOnlineCount);
 
         // --- CHAT ---
         const msgIn = document.getElementById('msg-input');
