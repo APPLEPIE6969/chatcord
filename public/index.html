@@ -1726,35 +1726,25 @@
             compressor.attack.value = 0.003;
             compressor.release.value = 0.25;
             
-            // Connect the audio processing chain
-            source.connect(filterNode);
+            // Connect nodes
+            source.connect(gainNode);
+            gainNode.connect(filterNode);
             filterNode.connect(compressor);
-            compressor.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+            compressor.connect(audioCtx.destination);
             
-            // Store reference for cleanup
-            noiseCancellationNode = { source, gainNode, filterNode, compressor };
-            
-            // Replace the original audio track with processed one
-            const processedStream = audioCtx.createMediaStreamDestination();
-            gainNode.connect(processedStream);
-            
-            // Update peer connections with processed stream
-            Object.values(peers).forEach(peer => {
-                const sender = peer.getSenders().find(s => s.track && s.track.kind === 'audio');
-                if (sender) {
-                    sender.replaceTrack(processedStream.stream.getAudioTracks()[0]);
-                }
-            });
+            // Store noise cancellation node
+            noiseCancellationNode = {
+                gainNode,
+                filterNode,
+                compressor
+            };
         }
         
         function disableNoiseCancellation() {
             if (noiseCancellationNode) {
-                // Disconnect all nodes
-                noiseCancellationNode.source.disconnect();
+                noiseCancellationNode.gainNode.disconnect();
                 noiseCancellationNode.filterNode.disconnect();
                 noiseCancellationNode.compressor.disconnect();
-                noiseCancellationNode.gainNode.disconnect();
                 noiseCancellationNode = null;
             }
             
