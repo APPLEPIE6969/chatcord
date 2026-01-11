@@ -161,6 +161,17 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        .chat-link {
+            color: #00b0f4;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .chat-link:hover {
+            color: #0080c0;
+            text-decoration: none;
+        }
+        .voice-users { margin-left: 28px; margin-bottom: 5px; }
         .voice-user { display: flex; align-items: center; padding: 4px 8px; border-radius: 4px; }
         .voice-avatar { 
             width: 24px; height: 24px; border-radius: 50%; 
@@ -1506,6 +1517,23 @@
 
         socket.on('onlineCount', updateOnlineCount);
 
+        // --- LINK DETECTION ---
+        function detectAndConvertLinks(text) {
+            // URL regex pattern
+            const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+            
+            return text.replace(urlPattern, function(url) {
+                // Add https:// if url starts with www.
+                let fullUrl = url;
+                if (url.startsWith('www.')) {
+                    fullUrl = 'https://' + url;
+                }
+                
+                // Create clickable link
+                return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" class="chat-link">${url}</a>`;
+            });
+        }
+
         // --- CHAT ---
         const msgIn = document.getElementById('msg-input');
         const sendBtn = document.getElementById('send-btn');
@@ -1571,6 +1599,10 @@
                             </div>`;
                     }
                 }
+                
+                // Detect and convert URLs to clickable links
+                let processedText = detectAndConvertLinks(data.text);
+                
                 div.innerHTML = `
                     <div class="avatar" style="${style}"></div>
                     <div class="msg-content">
@@ -1578,7 +1610,7 @@
                             <span class="username">${data.user}</span>
                             <span class="timestamp">${data.time}</span>
                         </div>
-                        <div class="text">${data.text} ${att}</div>
+                        <div class="text">${processedText} ${att}</div>
                     </div>`;
             }
             box.appendChild(div);
