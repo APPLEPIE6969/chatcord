@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="High-quality real-time chat application">
     <title>Chatcord</title>
     <style>
         /* --- THEMES --- */
@@ -16,12 +17,30 @@
             --text-muted: #72767d;
             --interactive-normal: #b9bbbe;
             --interactive-hover: #dcddde;
+            --interactive-muted: #4f5660;
             --input-background: #40444b;
             --brand-experiment: #5865F2;
             --green: #3ba55c;
             --red: #ed4245;
             --border: #202225;
         }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        @media (min-resolution: 2dppx) {
+            * { 
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                text-rendering: optimizeLegibility;
+            }
+        }
+        
+        @media (min-resolution: 3dppx) {
+            * { 
+                -webkit-font-smoothing: subpixel-antialiased;
+                text-rendering: geometricPrecision;
+            }
+        }
+        
         [data-theme="light"] {
             --bg-tertiary: #e3e5e8; --bg-secondary: #f2f3f5; --bg-primary: #ffffff;
             --header-primary: #060607; --header-secondary: #4f5660; --text-normal: #2e3338; 
@@ -35,12 +54,14 @@
             --brand-experiment: #3ba55c;
         }
 
-        * { box-sizing: border-box; }
+        * { 
+            box-sizing: border-box; 
+        }
         
         /* FIX FOR MOBILE HEIGHT ISSUES */
         body { 
             margin: 0; 
-            font-family: 'gg sans', 'Whitney', Helvetica, Arial, sans-serif; 
+            font-family: 'Inter', 'gg sans', 'Whitney', Helvetica, Arial, sans-serif; 
             background: var(--bg-tertiary); 
             color: var(--text-normal); 
             overflow: hidden; /* Stop whole page scrolling */
@@ -48,6 +69,13 @@
             height: 100dvh; /* Dynamic height for mobile browsers */
             position: fixed; /* Lock body in place */
             width: 100%;
+            font-size: 16px;
+            line-height: 1.4;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
         }
 
         #app { 
@@ -70,34 +98,58 @@
         
         .server-header { 
             height: 48px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; 
-            font-weight: bold; border-bottom: 1px solid var(--border); 
+            font-weight: 600; border-bottom: 1px solid var(--border); 
             color: var(--header-primary); box-shadow: 0 1px 0 rgba(0,0,0,0.06);
             font-size: 16px;
             flex-shrink: 0;
+            letter-spacing: 0.02em;
         }
 
         #settings-icon { cursor: pointer; color: var(--interactive-normal); font-size: 20px; transition: 0.2s; }
         #settings-icon:hover { color: var(--interactive-hover); transform: rotate(90deg); }
 
-        .channel-list { padding: 8px; flex-grow: 1; overflow-y: auto; }
-        
-        .category { 
-            font-size: 12px; color: var(--text-muted); font-weight: 700; 
-            text-transform: uppercase; margin: 16px 8px 4px 16px; 
+        .channel-icon { 
+            font-size: 16px; 
+            margin-right: 6px; 
+            opacity: 0.8; 
+            transition: opacity 0.2s ease; 
         }
 
-        .channel { 
-            padding: 6px 8px; margin: 1px 0; border-radius: 4px; cursor: pointer; 
-            color: var(--text-muted); display: flex; align-items: center; font-weight: 500;
-        }
-        .channel:hover { background-color: var(--input-background); color: var(--interactive-hover); }
-        .channel.active { background-color: rgba(88, 101, 242, 0.3); color: var(--header-primary); }
-        .channel-icon { width: 20px; text-align: center; margin-right: 6px; font-size: 18px; }
+        .channel-list { padding: 8px; flex-grow: 1; overflow-y: auto; }
         
+        .category { font-size: 12px; color: var(--text-muted); font-weight: bold; }
+
+        .channel { 
+            padding: 6px 12px; 
+            margin: 2px 0; 
+            border-radius: 6px; 
+            color: var(--text-normal); 
+            cursor: pointer; 
+            font-weight: 500; 
+            font-size: 14px; 
+            transition: all 0.2s ease; 
+        }
+        .channel:hover { 
+            background-color: var(--input-background); 
+            color: var(--interactive-hover); 
+        }
+        .channel.active { 
+            background-color: rgba(88, 101, 242, 0.3); 
+            color: var(--header-primary); 
+        }
+
         .voice-users { margin-left: 28px; margin-bottom: 5px; }
         .voice-user { display: flex; align-items: center; padding: 4px 8px; border-radius: 4px; }
-        .voice-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-experiment); margin-right: 8px; background-size: cover; box-shadow: 0 0 0 0px var(--green); transition: box-shadow 0.1s; }
-        .voice-name { font-size: 14px; color: var(--header-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .voice-avatar { 
+            width: 24px; height: 24px; border-radius: 50%; 
+            background: var(--brand-experiment); margin-right: 8px; 
+            background-size: cover; box-shadow: 0 0 0 0px var(--green); 
+            transition: box-shadow 0.1s;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+        .voice-name { font-size: 14px; color: var(--header-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
         .voice-user.speaking .voice-avatar { box-shadow: 0 0 0 2px var(--green); }
 
         /* USER DOCK */
@@ -107,14 +159,218 @@
         .conn-btn { float: right; background: none; border: none; color: var(--text-normal); cursor: pointer; font-weight: bold; }
 
         #user-dock { height: 52px; padding: 0 8px; display: flex; align-items: center; background: var(--bg-tertiary); }
-        .dock-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-experiment); margin-right: 8px; background-size: cover; cursor: pointer; }
-        .dock-info { flex-grow: 1; font-size: 13px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .dock-name { font-weight: bold; color: var(--header-primary); }
+        .dock-avatar { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            background: var(--brand-experiment); 
+            margin-right: 8px; 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            cursor: pointer;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+        .dock-info { 
+            flex-grow: 1; 
+            font-size: 13px; 
+            cursor: pointer; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            min-width: 0;
+            padding-right: 8px;
+        }
+        .dock-name { 
+            font-weight: 600; 
+            color: var(--header-primary); 
+            font-size: 14px; 
+            letter-spacing: 0.01em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .dock-discrim { color: var(--text-muted); font-size: 12px; font-weight: 400; }
         .dock-buttons { display: flex; }
-        .dock-btn { width: 32px; height: 32px; border-radius: 4px; background: none; border: none; color: var(--interactive-normal); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .dock-btn:hover { background-color: var(--input-background); }
-        .dock-btn.off { color: var(--red); position: relative; }
-        .dock-btn.off::after { content:''; position: absolute; width: 2px; height: 20px; background: var(--red); transform: rotate(45deg); }
+        .dock-btn { 
+            width: 32px; height: 32px; border-radius: 4px; background: none; border: none; 
+            color: var(--interactive-normal); cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(1);
+        }
+        .dock-btn:hover { 
+            background-color: var(--input-background);
+            transform: scale(1.1);
+        }
+        .dock-btn.off { 
+            color: var(--red); position: relative;
+            animation: muteDeafen 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dock-btn.off::after { 
+            content:''; position: absolute; width: 2px; height: 20px; 
+            background: var(--red); transform: rotate(45deg);
+            animation: strikethrough 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes muteDeafen {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(-10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        @keyframes strikethrough {
+            0% { transform: rotate(45deg) scaleX(0); }
+            100% { transform: rotate(45deg) scaleX(1); }
+        }
+
+        /* FRIENDS SYSTEM */
+        .friends-btn { position: relative; }
+        .notification-badge { 
+            position: absolute; top: -4px; right: -4px; 
+            background: var(--red); color: white; font-size: 10px; font-weight: bold; 
+            padding: 2px 4px; border-radius: 10px; min-width: 16px; text-align: center;
+            animation: badgePop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes badgePop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* FRIENDS MODAL */
+        .friends-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); align-items: center; justify-content: center; 
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .friends-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+        .friends-content { 
+            background: var(--bg-secondary); border-radius: 8px; 
+            width: 90%; max-width: 600px; height: 80%; max-height: 600px; 
+            display: flex; flex-direction: column;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .friends-modal.show .friends-content {
+            transform: scale(1) translateY(0);
+        }
+        .friends-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .friends-tabs { display: flex; background: var(--bg-tertiary); }
+        .friends-tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+        .friends-tab.active { background: var(--bg-secondary); color: var(--header-primary); border-bottom: 2px solid var(--brand-experiment); }
+        .friends-body { flex: 1; overflow-y: auto; padding: 16px; }
+        .friends-list, .notifications-list { display: none; }
+        .friends-list.active, .notifications-list.active { display: block; }
+        .friend-item { 
+            display: flex; align-items: center; padding: 12px; border-radius: 8px; 
+            margin-bottom: 8px; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0);
+        }
+        .friend-item:hover { 
+            background: var(--input-background);
+            transform: translateX(4px);
+        }
+        .friend-avatar { 
+            width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; 
+            background: var(--brand-experiment); background-size: cover;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+        .friend-info { flex: 1; }
+        .friend-name { font-weight: 600; color: var(--header-primary); font-size: 15px; letter-spacing: 0.01em; }
+        .friend-status { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .friend-status.online { color: var(--green); }
+        .friend-actions { display: flex; gap: 8px; }
+        .friend-btn { 
+            padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; 
+            font-size: 12px; font-weight: 500; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(1);
+        }
+        .friend-btn:hover { 
+            transform: scale(1.05);
+        }
+        .friend-btn.message { background: var(--brand-experiment); color: white; }
+        .friend-btn.message:hover { background: #4752C4; }
+        .friend-btn.voice { background: var(--green); color: white; }
+        .friend-btn.voice:hover { background: #2d7a46; }
+
+        .notification-item { 
+            display: flex; align-items: center; padding: 12px; border-radius: 8px; 
+            margin-bottom: 8px; background: var(--input-background);
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideInRight {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        .notification-avatar { 
+            width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; 
+            background: var(--brand-experiment); background-size: cover;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+        .notification-info { flex: 1; }
+        .notification-text { color: var(--text-normal); margin-bottom: 4px; font-weight: 500; font-size: 14px; }
+        .notification-time { font-size: 12px; color: var(--text-muted); }
+        .notification-actions { display: flex; gap: 8px; }
+        .notification-btn { 
+            padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; 
+            font-size: 12px; font-weight: 500; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(1);
+        }
+        .notification-btn:hover {
+            transform: scale(1.05);
+        }
+        .notification-btn.accept { background: var(--green); color: white; }
+        .notification-btn.accept:hover { background: #2d7a46; }
+        .notification-btn.reject { background: var(--red); color: white; }
+        .notification-btn.reject:hover { background: #c03537; }
+
+        /* PRIVATE CHAT MODAL */
+        .private-chat-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); align-items: center; justify-content: center; 
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .private-chat-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+        .private-chat-content { 
+            background: var(--bg-secondary); border-radius: 8px; 
+            width: 90%; max-width: 500px; height: 70%; max-height: 600px; 
+            display: flex; flex-direction: column;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .private-chat-modal.show .private-chat-content {
+            transform: scale(1) translateY(0);
+        }
+        .private-chat-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .private-chat-name { font-weight: 600; color: var(--header-primary); }
+        .private-chat-messages { flex: 1; overflow-y: auto; padding: 16px; }
+        .private-chat-input { padding: 16px; border-top: 1px solid var(--border); }
+        .private-input-wrapper { background: var(--input-background); border-radius: 8px; padding: 0 16px; display: flex; align-items: center; height: 44px; }
+        .private-input { background: transparent; border: none; width: 100%; color: var(--text-normal); font-size: 15px; padding: 0; outline: none; font-family: 'Inter', inherit; font-weight: 400; letter-spacing: 0.01em; }
 
         /* --- CHAT AREA --- */
         #chat-area { 
@@ -146,32 +402,331 @@
         #messages::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
 
         .message { display: flex; margin-top: 16px; max-width: 100%; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 16px; background-color: var(--brand-experiment); flex-shrink: 0; background-size: cover; }
+        .avatar { 
+            width: 40px; height: 40px; border-radius: 50%; margin-right: 16px; 
+            background-color: var(--brand-experiment); flex-shrink: 0; 
+            background-size: cover;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
         .msg-content { display: flex; flex-direction: column; min-width: 0; }
         .msg-header { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-        .username { font-weight: 500; color: var(--header-primary); }
+        .username { font-weight: 600; color: var(--header-primary); font-size: 15px; letter-spacing: 0.01em; }
         .timestamp { font-size: 12px; color: var(--text-muted); }
-        .text { margin-top: 4px; color: var(--text-normal); line-height: 1.375rem; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; }
-        .attachment-img { max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 5px; }
+        .text { margin-top: 4px; color: var(--text-normal); line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; font-size: 15px; font-weight: 400; }
+        .attachment-img { 
+            max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 5px;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+        .attachment-file {
+            display: inline-flex;
+            align-items: center;
+            background: var(--input-background);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-top: 8px;
+            text-decoration: none;
+            color: var(--text-normal);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 100%;
+            gap: 8px;
+            height: 32px;
+        }
+        .attachment-file:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--brand-experiment);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .attachment-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+        }
+        .attachment-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            margin-left: 0;
+            padding-left: 0;
+        }
+        .attachment-name {
+            font-weight: 600;
+            color: var(--header-primary);
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+        }
+        .attachment-size {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 0px;
+        }
+        .attachment-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+        .attachment-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-normal);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            line-height: 0;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+        .attachment-btn:hover {
+            background: var(--brand-experiment);
+            color: white;
+            transform: scale(1.1);
+        }
+        .attachment-btn.download:hover {
+            background: var(--green);
+        }
+        .attachment-btn.preview:hover {
+            background: var(--brand-experiment);
+        }
 
         /* INPUT */
         #input-area { 
             padding: 0 16px 24px 16px; 
             flex-shrink: 0; 
-            background: var(--bg-primary); /* Fix see-through on mobile */
+            background: var(--bg-primary); 
         }
-        #input-wrapper { background-color: var(--input-background); border-radius: 8px; padding: 0 16px; display: flex; align-items: center; min-height: 44px; }
-        #input-box { background: transparent; border: none; width: 100%; color: var(--text-normal); font-size: 16px; padding: 11px 0; outline: none; }
-        #upload-btn { background: none; border: none; color: var(--interactive-normal); font-size: 24px; cursor: pointer; padding-right: 16px; }
-        #send-btn { background: none; border: none; color: var(--brand-experiment); font-size: 20px; cursor: pointer; display: flex; align-items: center; height: 100%; }
+        #input-wrapper { 
+            background-color: var(--input-background); 
+            border-radius: 8px; 
+            padding: 0 16px; 
+            display: flex; 
+            align-items: center; 
+            height: 44px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+        #input-wrapper:focus-within {
+            border-color: var(--brand-experiment);
+            box-shadow: 0 0 0 1px var(--brand-experiment);
+        }
+        #msg-input { 
+            background: transparent; 
+            border: none; 
+            width: 100%; 
+            color: var(--text-normal); 
+            font-size: 15px; 
+            padding: 0; 
+            outline: none;
+            resize: none;
+            font-family: 'Inter', inherit;
+            line-height: 1.4;
+            height: 44px;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+        #send-btn { 
+            background: none; 
+            border: none; 
+            color: var(--interactive-muted); 
+            font-size: 16px; 
+            cursor: pointer; 
+            padding: 8px;
+            margin-left: 8px;
+            border-radius: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            position: relative;
+        }
+        #send-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: scale(1.05);
+        }
+        #send-btn.sendable {
+            color: var(--brand-experiment);
+        }
+        #send-btn.sendable:hover {
+            background-color: var(--brand-experiment);
+            color: white;
+            transform: scale(1.1);
+        }
+        #send-btn::before {
+            content: '➤';
+            font-size: 18px;
+            line-height: 1;
+        }
 
-        /* MODALS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-box { background: var(--bg-secondary); padding: 20px; border-radius: 5px; width: 90%; max-width: 400px; text-align: center; color: var(--text-normal); box-shadow: 0 2px 10px 0 rgba(0,0,0,0.5); }
+        #upload-btn { 
+            background: none; 
+            border: none; 
+            color: var(--interactive-normal); 
+            font-size: 20px; 
+            cursor: pointer; 
+            padding: 8px;
+            margin-right: 4px;
+            border-radius: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            position: relative;
+        }
+        #upload-btn:hover {
+            background-color: var(--brand-experiment);
+            color: white;
+            transform: scale(1.1);
+        }
+        #upload-btn::before {
+            content: '+';
+            font-size: 24px;
+            font-weight: 300;
+            line-height: 1;
+        }
+        #upload-btn:hover::after {
+            content: 'Upload File';
+            position: absolute;
+            left: 50px;
+            background: var(--bg-secondary);
+            color: var(--text-normal);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #upload-btn:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* UPLOAD LOADING BAR */
+        .upload-progress {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            min-width: 250px;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transform: translateX(300px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .upload-progress.show {
+            transform: translateX(0);
+        }
+        .upload-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .upload-progress-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--header-primary);
+        }
+        .upload-progress-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .upload-progress-close:hover {
+            background: var(--input-background);
+            color: var(--text-normal);
+        }
+        .upload-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--input-background);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        .upload-progress-fill {
+            height: 100%;
+            background: var(--brand-experiment);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .upload-progress-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            display: none; align-items: center; justify-content: center; 
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-box { 
+            background: var(--bg-secondary); padding: 20px; border-radius: 5px; 
+            width: 90%; max-width: 400px; text-align: center; 
+            color: var(--text-normal); 
+            box-shadow: 0 2px 10px 0 rgba(0,0,0,0.5);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-overlay.show .modal-box {
+            transform: scale(1) translateY(0);
+        }
         .modal-box input { width: 100%; padding: 10px; background: var(--input-background); border: none; color: var(--text-normal); margin-bottom: 10px; border-radius: 3px; }
         .btn { padding: 10px 20px; background: var(--brand-experiment); border: none; color: white; border-radius: 3px; cursor: pointer; font-weight: bold; }
         
-        .theme-btn { width: 30%; padding: 10px; border: 2px solid var(--input-background); background: var(--bg-primary); color: var(--text-normal); cursor: pointer; border-radius: 5px; }
+        .theme-btn { width: 30%; padding: 10px; border: 2px solid var(--input-background); background: var(--bg-primary); color: var(--text-normal); cursor: pointer; border-radius:5px; }
         .theme-btn:hover { border-color: var(--brand-experiment); }
 
         /* --- MOBILE SPECIFIC FIXES --- */
@@ -205,7 +760,6 @@
             #input-area { 
                 padding: 10px 10px max(10px, env(safe-area-inset-bottom)) 10px; 
             }
-            #input-wrapper { border-radius: 24px; }
         }
     </style>
 </head>
@@ -230,8 +784,13 @@
             
             <label style="font-size: 12px; color: var(--text-muted); font-weight: bold;">PROFILE</label>
             <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px; margin-top: 10px;">
-                <div id="settings-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--brand-experiment); background-size: cover;" onclick="document.getElementById('avatar-upload').click()"></div>
-                <input type="text" id="settings-name" placeholder="Nickname">
+                <div style="position: relative; width: 80px; height: 80px;">
+                    <div id="settings-avatar" style="width: 100%; height: 100%; border-radius: 50%; background: var(--brand-experiment); background-size: cover; cursor: pointer; transition: transform 0.2s ease;" onclick="document.getElementById('avatar-upload').click()"></div>
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; cursor: pointer;" onclick="document.getElementById('avatar-upload').click()" id="avatar-edit-overlay">
+                        <span style="font-size: 24px; color: white;">✏️</span>
+                    </div>
+                </div>
+                <input type="text" id="settings-name" placeholder="Nickname" style="flex: 1; min-width: 0; padding: 8px;" maxlength="20">
             </div>
             
             <label style="font-size: 12px; color: var(--text-muted); font-weight: bold;">THEME</label>
@@ -256,11 +815,8 @@
                 <span id="settings-icon" onclick="openSettings()">⚙️</span>
             </div>
             <div class="channel-list">
-                <div class="category">Text Channels</div>
-                <div class="channel active" onclick="switchChannel('general', this)"><span class="channel-icon">#</span>general</div>
-                <div class="channel" onclick="switchChannel('gaming', this)"><span class="channel-icon">#</span>gaming</div>
-                <div class="channel" onclick="switchChannel('music', this)"><span class="channel-icon">#</span>music</div>
-                <div class="channel" onclick="switchChannel('memes', this)"><span class="channel-icon">#</span>memes</div>
+                <div class="category">Global Chat</div>
+                <div class="channel active"><span class="channel-icon">#</span>global</div>
                 
                 <div class="category">Voice Channels</div>
                 <div class="channel" onclick="joinVoice('Lounge')"><span class="channel-icon">🔊</span>Lounge</div>
@@ -282,6 +838,7 @@
                         <div class="dock-discrim">#0001</div>
                     </div>
                     <div class="dock-buttons">
+                        <button id="btn-friends" class="dock-btn friends-btn" onclick="openFriends()">👥</button>
                         <button id="btn-mic" class="dock-btn" onclick="toggleMic()">🎤</button>
                         <button id="btn-deaf" class="dock-btn" onclick="toggleDeafen()">🎧</button>
                         <button class="dock-btn" onclick="openSettings()">⚙️</button>
@@ -294,14 +851,14 @@
             <div id="chat-header">
                 <!-- MOBILE MENU BUTTON -->
                 <button id="menu-btn" onclick="toggleMobileMenu()">☰</button>
-                <span id="header-hash">#</span> <span id="header-name">general</span>
+                <span id="header-hash">#</span> <span id="header-name">global</span>
             </div>
             <div id="messages"></div>
             <div id="input-area">
                 <div id="input-wrapper">
-                    <button id="upload-btn" onclick="document.getElementById('file-upload').click()">+</button>
-                    <input type="text" id="msg-input" placeholder="Message #general" autocomplete="off">
-                    <button id="send-btn" onclick="sendMsg()">➤</button>
+                    <button id="upload-btn" onclick="document.getElementById('file-upload').click()"></button>
+                    <input type="text" id="msg-input" placeholder="Message #global" autocomplete="off">
+                    <button id="send-btn" onclick="sendMsg()"></button>
                 </div>
             </div>
         </div>
@@ -311,11 +868,71 @@
     <input type="file" id="file-upload" style="display:none;" onchange="uploadFile()">
     <input type="file" id="avatar-upload" style="display:none;" onchange="uploadAvatar()">
 
+    <!-- UPLOAD PROGRESS -->
+    <div id="upload-progress" class="upload-progress">
+        <div class="upload-progress-header">
+            <div class="upload-progress-title">Uploading File...</div>
+            <button class="upload-progress-close" onclick="cancelUpload()">✕</button>
+        </div>
+        <div class="upload-progress-bar">
+            <div class="upload-progress-fill" id="upload-progress-fill"></div>
+        </div>
+        <div class="upload-progress-text" id="upload-progress-text">0%</div>
+    </div>
+
+    <!-- FRIENDS MODAL -->
+    <div id="friends-modal" class="friends-modal">
+        <div class="friends-content">
+            <div class="friends-header">
+                <h2>Friends</h2>
+                <button class="btn" style="background:transparent; color:var(--red);" onclick="closeFriends()">✕</button>
+            </div>
+            <div class="friends-tabs">
+                <div class="friends-tab active" onclick="switchFriendsTab('friends')">Friends</div>
+                <div class="friends-tab" onclick="switchFriendsTab('add')">Add Friend</div>
+                <div class="friends-tab" onclick="switchFriendsTab('notifications')">Notifications</div>
+            </div>
+            <div class="friends-body">
+                <div id="friends-list" class="friends-list active"></div>
+                <div id="add-friend" class="friends-list">
+                    <div style="text-align: center; padding: 20px;">
+                        <h3>Add Friend</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">Enter a username to send a friend request</p>
+                        <input type="text" id="friend-username" placeholder="Username" style="width: 100%; max-width: 300px; padding: 10px; background: var(--input-background); border: none; color: var(--text-normal); border-radius: 4px; margin-bottom: 10px;">
+                        <button class="btn" onclick="sendFriendRequest()">Send Friend Request</button>
+                    </div>
+                </div>
+                <div id="notifications-list" class="notifications-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRIVATE CHAT MODAL -->
+    <div id="private-chat-modal" class="private-chat-modal">
+        <div class="private-chat-content">
+            <div class="private-chat-header">
+                <div class="private-chat-name" id="private-chat-name">Username</div>
+                <button class="btn" style="background:transparent; color:var(--red);" onclick="closePrivateChat()">✕</button>
+            </div>
+            <div class="private-chat-messages" id="private-chat-messages"></div>
+            <div class="private-chat-input">
+                <div class="private-input-wrapper">
+                    <input type="text" id="private-msg-input" class="private-input" placeholder="Send a message...">
+                    <button onclick="sendPrivateMessage()" style="background: none; border: none; color: var(--brand-experiment); cursor: pointer; font-size: 16px;">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         let me = { name: "", avatar: null };
         let micOn = true, deafOn = false;
+        let friendsList = [];
+        let notificationsList = [];
+        let currentPrivateChat = null;
+        let currentUpload = null;
 
         // --- MOBILE MENU LOGIC ---
         function toggleMobileMenu() {
@@ -356,33 +973,487 @@
         function startApp() {
             socket.emit('join', me);
             updateDock();
+            updateSendButton();
+            socket.emit('getFriendsList');
+            socket.emit('getNotifications');
         }
 
+        // --- FRIENDS SYSTEM ---
+        function openFriends() {
+            const modal = document.getElementById('friends-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            socket.emit('getFriendsList');
+            socket.emit('getNotifications');
+        }
+        
+        function closeFriends() {
+            const modal = document.getElementById('friends-modal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+        
+        function switchFriendsTab(tab) {
+            document.querySelectorAll('.friends-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.friends-list, .notifications-list').forEach(l => l.classList.remove('active'));
+            
+            if (tab === 'friends') {
+                document.querySelector('.friends-tab:nth-child(1)').classList.add('active');
+                document.getElementById('friends-list').classList.add('active');
+            } else if (tab === 'add') {
+                document.querySelector('.friends-tab:nth-child(2)').classList.add('active');
+                document.getElementById('add-friend').classList.add('active');
+            } else if (tab === 'notifications') {
+                document.querySelector('.friends-tab:nth-child(3)').classList.add('active');
+                document.getElementById('notifications-list').classList.add('active');
+            }
+        }
+        
+        function sendFriendRequest() {
+            const username = document.getElementById('friend-username').value.trim();
+            if (username) {
+                socket.emit('sendFriendRequest', username);
+                document.getElementById('friend-username').value = '';
+            }
+        }
+        
+        function acceptFriendRequest(fromId) {
+            socket.emit('acceptFriendRequest', fromId);
+        }
+        
+        function rejectFriendRequest(fromId) {
+            socket.emit('rejectFriendRequest', fromId);
+        }
+        
+        function openPrivateChat(friendId, friendName) {
+            currentPrivateChat = friendId;
+            document.getElementById('private-chat-name').innerText = friendName;
+            document.getElementById('private-chat-messages').innerHTML = '';
+            const modal = document.getElementById('private-chat-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            socket.emit('getPrivateMessages', friendId);
+        }
+        
+        function closePrivateChat() {
+            const modal = document.getElementById('private-chat-modal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+            currentPrivateChat = null;
+        }
+        
+        function sendPrivateMessage() {
+            const input = document.getElementById('private-msg-input');
+            if (input.value.trim() && currentPrivateChat) {
+                socket.emit('privateMessage', {
+                    targetId: currentPrivateChat,
+                    text: input.value
+                });
+                input.value = '';
+            }
+        }
+        
+        // Socket event handlers for friends system
+        socket.on('friendsUpdate', (friends) => {
+            friendsList = friends;
+            renderFriendsList();
+        });
+        
+        socket.on('notificationsUpdate', (notifications) => {
+            notificationsList = notifications;
+            renderNotificationsList();
+            updateNotificationBadge();
+        });
+        
+        socket.on('notification', (notification) => {
+            if (!notificationsList.find(n => n.from === notification.from && n.type === notification.type)) {
+                notificationsList.push(notification);
+                renderNotificationsList();
+                updateNotificationBadge();
+            }
+        });
+        
+        socket.on('friendAccepted', (friend) => {
+            // Update friends list
+            if (!friendsList.find(f => f.id === friend.id)) {
+                friendsList.push(friend);
+                renderFriendsList();
+            }
+        });
+        
+        socket.on('privateMessage', (msg) => {
+            if (currentPrivateChat === (msg.from === socket.id ? msg.to : msg.from)) {
+                renderPrivateMessage(msg);
+            }
+        });
+        
+        socket.on('privateMessagesHistory', (data) => {
+            if (currentPrivateChat === data.targetId) {
+                document.getElementById('private-chat-messages').innerHTML = '';
+                data.messages.forEach(renderPrivateMessage);
+            }
+        });
+        
+        socket.on('friendRequestSent', (username) => {
+            alert(`Friend request sent to ${username}!`);
+        });
+        
+        socket.on('friendRequestError', (error) => {
+            alert(error);
+        });
+        
+        function renderFriendsList() {
+            const container = document.getElementById('friends-list');
+            container.innerHTML = '';
+            
+            if (friendsList.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted);">No friends yet. Add some friends to get started!</div>';
+                return;
+            }
+            
+            friendsList.forEach(friend => {
+                const div = document.createElement('div');
+                div.className = 'friend-item';
+                const avatarStyle = friend.avatar ? `background-image: url('${friend.avatar}')` : '';
+                const statusClass = friend.online ? 'online' : '';
+                const statusText = friend.online ? 'Online' : 'Offline';
+                
+                div.innerHTML = `
+                    <div class="friend-avatar" style="${avatarStyle}"></div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="friend-btn message" onclick="openPrivateChat('${friend.id}', '${friend.name}')">Message</button>
+                        ${friend.online ? `<button class="friend-btn voice" onclick="startPrivateVoice('${friend.id}')">Voice</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function renderNotificationsList() {
+            const container = document.getElementById('notifications-list');
+            container.innerHTML = '';
+            
+            if (notificationsList.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted);">No new notifications</div>';
+                return;
+            }
+            
+            notificationsList.forEach((notification, index) => {
+                const div = document.createElement('div');
+                div.className = 'notification-item';
+                const avatarStyle = notification.fromAvatar ? `background-image: url('${notification.fromAvatar}')` : '';
+                const time = new Date(notification.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                
+                if (notification.type === 'friend_request') {
+                    div.innerHTML = `
+                        <div class="notification-avatar" style="${avatarStyle}"></div>
+                        <div class="notification-info">
+                            <div class="notification-text"><strong>${notification.fromName}</strong> sent you a friend request</div>
+                            <div class="notification-time">${time}</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-btn accept" onclick="acceptFriendRequest('${notification.from}')">Accept</button>
+                            <button class="notification-btn reject" onclick="rejectFriendRequest('${notification.from}')">Reject</button>
+                        </div>
+                    `;
+                }
+                
+                // Stagger animations
+                setTimeout(() => {
+                    container.appendChild(div);
+                }, index * 100);
+            });
+        }
+        
+        function renderPrivateMessage(msg) {
+            const container = document.getElementById('private-chat-messages');
+            const div = document.createElement('div');
+            div.className = 'message';
+            const isMe = msg.from === socket.id;
+            const avatarStyle = msg.avatar ? `background-image: url('${msg.avatar}')` : '';
+            
+            div.innerHTML = `
+                <div class="avatar" style="${avatarStyle}"></div>
+                <div class="msg-content">
+                    <div class="msg-header">
+                        <span class="username">${msg.user}</span>
+                        <span class="timestamp">${msg.time}</span>
+                    </div>
+                    <div class="text">${msg.text}</div>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.querySelector('.notification-badge');
+            const count = notificationsList.length;
+            
+            if (count > 0) {
+                if (!badge) {
+                    const btn = document.getElementById('btn-friends');
+                    const badgeEl = document.createElement('div');
+                    badgeEl.className = 'notification-badge';
+                    badgeEl.textContent = count;
+                    btn.appendChild(badgeEl);
+                } else {
+                    badge.textContent = count;
+                    // Re-trigger animation
+                    badge.style.animation = 'none';
+                    void badge.offsetWidth;
+                    badge.style.animation = 'badgePop 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                }
+            } else if (badge) {
+                badge.remove();
+            }
+        }
+        
+        // --- UPLOAD PROGRESS ---
+        function showUploadProgress(fileName = 'Uploading File...') {
+            const progressEl = document.getElementById('upload-progress');
+            const titleEl = progressEl.querySelector('.upload-progress-title');
+            const fillEl = document.getElementById('upload-progress-fill');
+            const textEl = document.getElementById('upload-progress-text');
+            
+            titleEl.textContent = fileName.length > 20 ? fileName.substring(0, 17) + '...' : fileName;
+            fillEl.style.width = '0%';
+            textEl.textContent = '0%';
+            
+            progressEl.classList.add('show');
+            
+            // Simulate progress (since we can't track real progress with simple fetch)
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (progress < 90) {
+                    progress += Math.random() * 15;
+                    progress = Math.min(progress, 90);
+                    updateUploadProgress(Math.round(progress));
+                } else {
+                    clearInterval(interval);
+                }
+            }, 200);
+            
+            // Store interval to clear it when upload completes
+            progressEl.dataset.interval = interval;
+        }
+        
+        function updateUploadProgress(percent) {
+            const fillEl = document.getElementById('upload-progress-fill');
+            const textEl = document.getElementById('upload-progress-text');
+            
+            fillEl.style.width = percent + '%';
+            textEl.textContent = percent + '%';
+            
+            if (percent >= 100) {
+                setTimeout(() => {
+                    hideUploadProgress();
+                }, 1000);
+            }
+        }
+        
+        function hideUploadProgress() {
+            const progressEl = document.getElementById('upload-progress');
+            
+            // Clear any running interval
+            if (progressEl.dataset.interval) {
+                clearInterval(progressEl.dataset.interval);
+                delete progressEl.dataset.interval;
+            }
+            
+            progressEl.classList.remove('show');
+            currentUpload = null;
+        }
+        
+        function cancelUpload() {
+            if (currentUpload) {
+                currentUpload.abort();
+                currentUpload = null;
+            }
+            hideUploadProgress();
+        }
+        document.getElementById('private-msg-input').addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                sendPrivateMessage();
+            }
+        });
+        
+        function startPrivateVoice(friendId) {
+            // For now, just show a message - private voice would require peer-to-peer connection setup
+            alert('Private voice chat would be implemented here with WebRTC peer connection');
+        }
+        document.getElementById('friend-username').addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                sendFriendRequest();
+            }
+        });
+        
+        // --- FILE HANDLING ---
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const iconMap = {
+                // Documents
+                'pdf': '📄',
+                'doc': '📝', 'docx': '📝',
+                'txt': '📄',
+                'rtf': '📄',
+                // Spreadsheets
+                'xls': '📊', 'xlsx': '📊',
+                'csv': '📊',
+                // Presentations
+                'ppt': '📽️', 'pptx': '📽️',
+                // Archives
+                'zip': '🗜️', 'rar': '🗜️', '7z': '🗜️',
+                'tar': '🗜️', 'gz': '🗜️',
+                // Code
+                'js': '📜', 'html': '🌐', 'css': '🎨',
+                'py': '🐍', 'java': '☕', 'cpp': '⚙️',
+                'json': '📋', 'xml': '📋', 'md': '📝',
+                // Video
+                'mp4': '🎬', 'avi': '🎬', 'mov': '🎬',
+                'wmv': '🎬', 'flv': '🎬', 'webm': '🎬',
+                // Audio
+                'mp3': '🎵', 'wav': '🎵', 'flac': '🎵',
+                'aac': '🎵', 'ogg': '🎵',
+                // Images
+                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️',
+                'gif': '🖼️', 'bmp': '🖼️', 'svg': '🖼️',
+                'webp': '🖼️', 'ico': '🖼️',
+                // Other
+                'exe': '⚙️', 'msi': '⚙️',
+                'apk': '📱', 'ipa': '📱',
+                'psd': '🎨', 'ai': '🎨',
+                'sketch': '🎨',
+                'torrent': '🔗'
+            };
+            return iconMap[ext] || '📁';
+        }
+        
+        function downloadFile(url, filename) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function previewFile(url, filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const previewableExts = ['txt', 'json', 'xml', 'md', 'js', 'html', 'css', 'py', 'java', 'cpp'];
+            const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico'];
+            
+            if (imageExts.includes(ext)) {
+                window.open(url, '_blank');
+            } else if (previewableExts.includes(ext)) {
+                window.open(url, '_blank');
+            } else if (ext === 'pdf') {
+                window.open(url, '_blank');
+            } else {
+                // For non-previewable files, just download them
+                downloadFile(url, filename);
+            }
+        }
         // --- THEMES ---
         function setTheme(t) {
             document.documentElement.setAttribute('data-theme', t);
             localStorage.setItem('chatcord_theme', t);
+            
+            // Update pencil color if settings is open
+            const overlay = document.getElementById('avatar-edit-overlay');
+            if (overlay && overlay.parentElement.style.display !== 'none') {
+                const pencil = overlay.querySelector('span');
+                const pencilColor = (t === 'light') ? 'black' : 'white';
+                pencil.style.color = pencilColor;
+            }
         }
 
         // --- SETTINGS ---
         function openSettings() {
-            document.getElementById('settings-overlay').style.display = 'flex';
+            const overlay = document.getElementById('settings-overlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('show'), 10);
             document.getElementById('settings-name').value = me.name;
             if(me.avatar) {
                 document.getElementById('settings-avatar').style.backgroundImage = `url('${me.avatar}')`;
                 document.getElementById('settings-avatar').dataset.url = me.avatar;
             }
+            
+            // Setup avatar hover effect
+            setupAvatarHover();
         }
-        function closeSettings() { document.getElementById('settings-overlay').style.display = 'none'; }
+        
+        function setupAvatarHover() {
+            const avatar = document.getElementById('settings-avatar');
+            const overlay = document.getElementById('avatar-edit-overlay');
+            const pencil = overlay.querySelector('span');
+            
+            // Determine pencil color based on theme
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'normal';
+            const pencilColor = (currentTheme === 'light') ? 'black' : 'white';
+            pencil.style.color = pencilColor;
+            
+            // Hover effect
+            avatar.addEventListener('mouseenter', () => {
+                overlay.style.opacity = '1';
+                avatar.style.transform = 'scale(1.05)';
+            });
+            
+            avatar.addEventListener('mouseleave', () => {
+                overlay.style.opacity = '0';
+                avatar.style.transform = 'scale(1)';
+            });
+            
+            overlay.addEventListener('mouseenter', () => {
+                overlay.style.opacity = '1';
+                avatar.style.transform = 'scale(1.05)';
+            });
+            
+            overlay.addEventListener('mouseleave', () => {
+                overlay.style.opacity = '0';
+                avatar.style.transform = 'scale(1)';
+            });
+        }
+        function closeSettings() { 
+            const overlay = document.getElementById('settings-overlay');
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.style.display = 'none', 300);
+        }
 
         function uploadAvatar() {
             const f = document.getElementById('avatar-upload').files[0];
             if(!f) return;
-            const fd = new FormData(); fd.append('file', f);
-            fetch('/upload', {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
-                const url = `/uploads/${d.filename}`;
-                document.getElementById('settings-avatar').style.backgroundImage = `url('${url}')`;
-                document.getElementById('settings-avatar').dataset.url = url;
+            
+            showUploadProgress('Uploading avatar...');
+            
+            const fd = new FormData(); 
+            fd.append('file', f);
+            
+            currentUpload = fetch('/upload', {
+                method:'POST', 
+                body: fd
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+                return response.json();
+            }).then(data => {
+                updateUploadProgress(100);
+                setTimeout(() => {
+                    hideUploadProgress();
+                    const url = `/uploads/${data.filename}`;
+                    document.getElementById('settings-avatar').style.backgroundImage = `url('${url}')`;
+                    document.getElementById('settings-avatar').dataset.url = url;
+                }, 500);
+            }).catch(error => {
+                console.error('Avatar upload error:', error);
+                hideUploadProgress();
+                alert('Avatar upload failed. Please try again.');
             });
         }
 
@@ -403,12 +1474,30 @@
 
         // --- CHAT ---
         const msgIn = document.getElementById('msg-input');
-        msgIn.addEventListener("keypress", e => { if(e.key==="Enter") sendMsg(); });
+        const sendBtn = document.getElementById('send-btn');
+        
+        // Update send button state
+        function updateSendButton() {
+            if (msgIn.value.trim()) {
+                sendBtn.classList.add('sendable');
+            } else {
+                sendBtn.classList.remove('sendable');
+            }
+        }
+        
+        msgIn.addEventListener('input', updateSendButton);
+        msgIn.addEventListener("keypress", e => { 
+            if(e.key === "Enter") {
+                sendMsg(); 
+            }
+        });
+        
         function sendMsg() {
             if(msgIn.value.trim() !== "") {
                 socket.emit('chatMessage', { text: msgIn.value });
                 msgIn.value = "";
-                msgIn.focus(); // Keep keyboard open
+                updateSendButton();
+                msgIn.focus();
             }
         }
 
@@ -425,8 +1514,28 @@
                 let att = '';
                 if(data.file) {
                     const p = `/uploads/${data.file.filename}`;
-                    if(data.file.filename.match(/\.(jpg|png|gif)$/i)) att = `<br><a href="${p}" target="_blank"><img src="${p}" class="attachment-img"></a>`;
-                    else att = `<br><a href="${p}" target="_blank" class="attachment-file">📁 ${data.file.originalName}</a>`;
+                    const fileSize = data.file.originalName.length > 20 ? data.file.originalName.substring(0, 17) + '...' : data.file.originalName;
+                    
+                    if(data.file.filename.match(/\.(jpg|png|gif|jpeg|webp)$/i)) {
+                        att = `<br><img src="${p}" class="attachment-img" onclick="window.open('${p}', '_blank')" style="cursor: pointer;">`;
+                    } else {
+                        const fileIcon = getFileIcon(data.file.originalName);
+                        att = `<br>
+                            <div class="attachment-file">
+                                <div class="attachment-icon">${fileIcon}</div>
+                                <div class="attachment-info">
+                                    <div class="attachment-name">${data.file.originalName}</div>
+                                </div>
+                                <div class="attachment-actions">
+                                    <button class="attachment-btn download" onclick="downloadFile('${p}', '${data.file.originalName}')" title="Download">
+                                        ⬇️
+                                    </button>
+                                    <button class="attachment-btn preview" onclick="previewFile('${p}', '${data.file.originalName}')" title="Preview">
+                                        👁️
+                                    </button>
+                                </div>
+                            </div>`;
+                    }
                 }
                 div.innerHTML = `
                     <div class="avatar" style="${style}"></div>
@@ -445,25 +1554,35 @@
 
         socket.on('message', renderMessage);
         socket.on('loadHistory', h => { document.getElementById('messages').innerHTML=''; h.forEach(renderMessage); });
-        socket.on('channelSwitched', d => {
-            document.getElementById('messages').innerHTML = `<div style='padding:20px; color:var(--text-muted)'><h1>#${d.channel}</h1>Start of channel.</div>`;
-            d.history.forEach(renderMessage);
-        });
-
-        window.switchChannel = (n, el) => {
-            document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('header-name').innerText = n;
-            document.getElementById('msg-input').placeholder = `Message #${n}`;
-            socket.emit('switchChannel', n);
-            if(window.innerWidth <= 768) toggleMobileMenu();
-        }
 
         function uploadFile() {
             const f = document.getElementById('file-upload').files[0];
             if(!f) return;
-            const fd = new FormData(); fd.append('file', f);
-            fetch('/upload', {method:'POST', body:fd}).then(r=>r.json()).then(d=>socket.emit('chatMessage', {text:"", file:d}));
+            
+            showUploadProgress(f.name);
+            
+            const fd = new FormData(); 
+            fd.append('file', f);
+            
+            currentUpload = fetch('/upload', {
+                method:'POST', 
+                body: fd
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+                return response.json();
+            }).then(data => {
+                updateUploadProgress(100);
+                setTimeout(() => {
+                    hideUploadProgress();
+                    socket.emit('chatMessage', {text:"", file:data});
+                }, 500);
+            }).catch(error => {
+                console.error('Upload error:', error);
+                hideUploadProgress();
+                alert('File upload failed. Please try again.');
+            });
         }
 
         // --- VOICE ---
@@ -557,14 +1676,39 @@
         }
 
         function toggleMic() {
+            const btn = document.getElementById('btn-mic');
             micOn = !micOn;
-            localStream.getAudioTracks()[0].enabled = micOn;
-            document.getElementById('btn-mic').classList.toggle('off', !micOn);
+            
+            if (localStream) {
+                localStream.getAudioTracks()[0].enabled = micOn;
+            }
+            
+            // Remove animation class
+            btn.classList.remove('off');
+            
+            // Force reflow to restart animation
+            void btn.offsetWidth;
+            
+            if (!micOn) {
+                btn.classList.add('off');
+            }
         }
+        
         function toggleDeafen() {
+            const btn = document.getElementById('btn-deaf');
             deafOn = !deafOn;
+            
             document.querySelectorAll('audio').forEach(a => a.muted = deafOn);
-            document.getElementById('btn-deaf').classList.toggle('off', deafOn);
+            
+            // Remove animation class
+            btn.classList.remove('off');
+            
+            // Force reflow to restart animation
+            void btn.offsetWidth;
+            
+            if (deafOn) {
+                btn.classList.add('off');
+            }
         }
     </script>
 </body>

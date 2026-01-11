@@ -1,0 +1,58 @@
+{
+  "global": [
+    {
+      "user": "ApplePie",
+      "avatar": null,
+      "text": "yo",
+      "file": null,
+      "type": "user",
+      "time": "13:57",
+      "timestamp": 1768136235620
+    },
+    {
+      "user": "ApplePie",
+      "avatar": null,
+      "text": "",
+      "file": {
+        "filename": "1768136662654-Git-2.52.0-64-bit.exe",
+        "originalName": "Git-2.52.0-64-bit.exe"
+      },
+      "type": "user",
+      "time": "14:04",
+      "timestamp": 1768136663888
+    },
+    {
+      "user": "ApplePie",
+      "avatar": null,
+      "text": "",
+      "file": {
+        "filename": "1768136671358-All The Things She Said 2020 Sub Sonik Remix.m4a",
+        "originalName": "All The Things She Said 2020 Sub Sonik Remix.m4a"
+      },
+      "type": "user",
+      "time": "14:04",
+      "timestamp": 1768136672472
+    },
+    {
+      "user": "ApplePie",
+      "avatar": null,
+      "text": "",
+      "file": {
+        "filename": "1768136691098-WindsurfUserSetup-x64-1.13.5.exe",
+        "originalName": "WindsurfUserSetup-x64-1.13.5.exe"
+      },
+      "type": "user",
+      "time": "14:04",
+      "timestamp": 1768136693623
+    },
+    {
+      "user": "ApplePie",
+      "avatar": "/uploads/1768140969173-Schermafbeelding 2025-12-31 002329.png",
+      "text": "yo",
+      "file": null,
+      "type": "user",
+      "time": "15:16",
+      "timestamp": 1768140974107
+    }
+  ]
+}
