@@ -171,7 +171,26 @@
             color: #0080c0;
             text-decoration: none;
         }
-        .voice-users { margin-left: 28px; margin-bottom: 5px; }
+        .noise-toggle {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-normal);
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 4px;
+            transition: all 0.2s ease;
+        }
+        .noise-toggle:hover {
+            background: var(--brand-experiment);
+            color: white;
+        }
+        .noise-toggle.active {
+            background: var(--green);
+            color: white;
+        }
         .voice-user { display: flex; align-items: center; padding: 4px 8px; border-radius: 4px; }
         .voice-avatar { 
             width: 24px; height: 24px; border-radius: 50%; 
@@ -857,9 +876,9 @@
                 </div>
                 
                 <div class="category">Voice Channels</div>
-                <div class="channel" onclick="joinVoice('Lounge')"><span class="channel-icon">🔊</span>Lounge</div>
+                <div class="channel" onclick="joinVoice('Lounge')"><span class="channel-icon">🔊</span>Lounge <button class="noise-toggle" onclick="toggleNoiseCancellation()" title="Toggle Noise Cancellation">🎙️</button></div>
                 <div id="voice-list-Lounge" class="voice-users"></div>
-                <div class="channel" onclick="joinVoice('Gaming')"><span class="channel-icon">🔊</span>Gaming</div>
+                <div class="channel" onclick="joinVoice('Gaming')"><span class="channel-icon">🔊</span>Gaming <button class="noise-toggle" onclick="toggleNoiseCancellation()" title="Toggle Noise Cancellation">🎙️</button></div>
                 <div id="voice-list-Gaming" class="voice-users"></div>
             </div>
 
@@ -1653,6 +1672,8 @@
 
         // --- VOICE ---
         let localStream, peers = {}, currentRoom = null, audioCtx, analyser;
+        let noiseCancellationEnabled = false;
+        let noiseCancellationNode = null;
         
         // Add beforeunload event listener for voice channel protection
         window.addEventListener('beforeunload', function(e) {
@@ -1662,6 +1683,104 @@
                 return e.returnValue;
             }
         });
+        
+        // Noise Cancellation Function
+        function toggleNoiseCancellation() {
+            if (!currentRoom) {
+                alert('You need to be in a voice channel to use noise cancellation.');
+                return;
+            }
+            
+            noiseCancellationEnabled = !noiseCancellationEnabled;
+            updateNoiseCancellationButtons();
+            
+            if (localStream) {
+                if (noiseCancellationEnabled) {
+                    enableNoiseCancellation();
+                } else {
+                    disableNoiseCancellation();
+                }
+            }
+        }
+        
+        function enableNoiseCancellation() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            // Create audio processing chain
+            const source = audioCtx.createMediaStreamSource(localStream);
+            const gainNode = audioCtx.createGain();
+            const filterNode = audioCtx.createBiquadFilter();
+            const compressor = audioCtx.createDynamicsCompressor();
+            
+            // Configure filter for voice frequencies (80Hz - 4000Hz)
+            filterNode.type = 'bandpass';
+            filterNode.frequency.value = 1000; // Center frequency
+            filterNode.Q.value = 2; // Bandwidth
+            
+            // Configure compressor to reduce background noise
+            compressor.threshold.value = -30;
+            compressor.knee.value = 40;
+            compressor.ratio.value = 12;
+            compressor.attack.value = 0.003;
+            compressor.release.value = 0.25;
+            
+            // Connect the audio processing chain
+            source.connect(filterNode);
+            filterNode.connect(compressor);
+            compressor.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            // Store reference for cleanup
+            noiseCancellationNode = { source, gainNode, filterNode, compressor };
+            
+            // Replace the original audio track with processed one
+            const processedStream = audioCtx.createMediaStreamDestination();
+            gainNode.connect(processedStream);
+            
+            // Update peer connections with processed stream
+            Object.values(peers).forEach(peer => {
+                const sender = peer.getSenders().find(s => s.track && s.track.kind === 'audio');
+                if (sender) {
+                    sender.replaceTrack(processedStream.stream.getAudioTracks()[0]);
+                }
+            });
+        }
+        
+        function disableNoiseCancellation() {
+            if (noiseCancellationNode) {
+                // Disconnect all nodes
+                noiseCancellationNode.source.disconnect();
+                noiseCancellationNode.filterNode.disconnect();
+                noiseCancellationNode.compressor.disconnect();
+                noiseCancellationNode.gainNode.disconnect();
+                noiseCancellationNode = null;
+            }
+            
+            // Restore original audio track to peer connections
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                Object.values(peers).forEach(peer => {
+                    const sender = peer.getSenders().find(s => s.track && s.track.kind === 'audio');
+                    if (sender) {
+                        sender.replaceTrack(audioTrack);
+                    }
+                });
+            }
+        }
+        
+        function updateNoiseCancellationButtons() {
+            document.querySelectorAll('.noise-toggle').forEach(btn => {
+                if (noiseCancellationEnabled) {
+                    btn.classList.add('active');
+                    btn.title = 'Disable Noise Cancellation';
+                } else {
+                    btn.classList.remove('active');
+                    btn.title = 'Enable Noise Cancellation';
+                }
+            });
+        }
         
         async function joinVoice(room) {
             if(currentRoom) leaveVoice();
@@ -1677,6 +1796,13 @@
         }
 
         function leaveVoice() {
+            // Disable noise cancellation if enabled
+            if (noiseCancellationEnabled) {
+                disableNoiseCancellation();
+                noiseCancellationEnabled = false;
+                updateNoiseCancellationButtons();
+            }
+            
             if(localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
             Object.values(peers).forEach(p => p.close());
             peers = {};
